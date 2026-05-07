@@ -1,5 +1,8 @@
 # 抽了吗 - Android 戒烟桌面小组件
 
+[![Build & Release APK](https://github.com/zayer0817/QuitSmoke/actions/workflows/build.yml/badge.svg)](https://github.com/zayer0817/QuitSmoke/actions/workflows/build.yml)
+[![Release](https://img.shields.io/github/v/release/zayer0817/QuitSmoke?include_prereleases&label=download)](https://github.com/zayer0817/QuitSmoke/releases)
+
 > 极简记录，数据说话，辅助你逐步戒烟。
 
 ---
