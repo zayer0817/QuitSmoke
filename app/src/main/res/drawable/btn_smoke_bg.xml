@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "抽一根"按钮背景 - 渐变红色警示风格 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="#FF6B6B"
+        android:endColor="#EE5A24"
+        android:angle="135" />
+    <corners android:radius="18dp" />
+</shape>

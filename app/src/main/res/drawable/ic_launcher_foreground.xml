@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 扁平化 emoji 风格络腮胡大叔抽烟 - 参考图片样式 -->
+    <!-- 中心点 (54,54)，人物整体居中 -->
+
+    <!-- ===== 身体/衣服（深色T恤） ===== -->
+    <path
+        android:fillColor="#2D3436"
+        android:pathData="M20,108 L20,95 Q20,80 35,78 L73,78 Q88,80 88,95 L88,108 Z"/>
+
+    <!-- ===== 脖子 ===== -->
+    <path
+        android:fillColor="#E8B89A"
+        android:pathData="M38,72 L38,80 L70,80 L70,72 Z"/>
+
+    <!-- ===== 头部（圆脸） ===== -->
+    <path
+        android:fillColor="#F4C2A1"
+        android:pathData="M28,50 Q28,22 54,22 Q80,22 80,50 L80,62 Q80,82 54,84 Q28,82 28,62 Z"/>
+
+    <!-- ===== 耳朵 ===== -->
+    <path
+        android:fillColor="#E8B89A"
+        android:pathData="M28,48 Q24,48 24,56 Q24,64 28,64 Z"/>
+    <path
+        android:fillColor="#E8B89A"
+        android:pathData="M80,48 Q84,48 84,56 Q84,64 80,64 Z"/>
+
+    <!-- ===== 头发（深棕色短发） ===== -->
+    <path
+        android:fillColor="#5D4037"
+        android:pathData="M28,50 Q28,18 54,18 Q80,18 80,50 Q80,40 76,34 Q72,28 54,28 Q36,28 32,34 Q28,40 28,50 Z"/>
+
+    <!-- ===== 眉毛（深棕色） ===== -->
+    <path
+        android:fillColor="#4E342E"
+        android:pathData="M38,40 Q44,38 50,40 L50,42 Q44,41 38,42 Z"/>
+    <path
+        android:fillColor="#4E342E"
+        android:pathData="M58,40 Q64,38 70,40 L70,42 Q64,41 58,42 Z"/>
+
+    <!-- ===== 眼睛（emoji风格黑点眼） ===== -->
+    <path
+        android:fillColor="#2D3436"
+        android:pathData="M42,46 Q42,44 44,44 Q46,44 46,46 Q46,48 44,48 Q42,48 42,46 Z"/>
+    <path
+        android:fillColor="#2D3436"
+        android:pathData="M62,46 Q62,44 64,44 Q66,44 66,46 Q66,48 64,48 Q62,48 62,46 Z"/>
+
+    <!-- ===== 鼻子 ===== -->
+    <path
+        android:fillColor="#E8A882"
+        android:pathData="M52,50 L56,50 L55,58 Q55,61 54,61 Q53,61 53,58 Z"/>
+
+    <!-- ===== 络腮胡 ===== -->
+    <!-- 下巴和脸颊的胡子 -->
+    <path
+        android:fillColor="#5D4037"
+        android:pathData="M28,58 Q28,84 54,86 Q80,84 80,58 Q78,66 74,70 Q70,74 66,74 L66,78 Q66,84 54,86 Q42,84 42,78 L42,74 Q38,74 34,70 Q30,66 28,58 Z"/>
+
+    <!-- 八字胡 -->
+    <path
+        android:fillColor="#5D4037"
+        android:pathData="M40,64 Q46,60 54,62 Q62,60 68,64 Q66,68 60,66 Q56,65 54,66 Q52,65 48,66 Q42,68 40,64 Z"/>
+
+    <!-- ===== 嘴巴（叼烟用） ===== -->
+    <path
+        android:fillColor="#8D6E63"
+        android:pathData="M46,68 L62,68 Q62,72 54,72 Q46,72 46,68 Z"/>
+
+    <!-- ===== 香烟 ===== -->
+    <!-- 香烟白色纸管 -->
+    <path
+        android:fillColor="#F5F0E8"
+        android:pathData="M62,66 L88,60 L89,64 L63,70 Z"/>
+    <!-- 过滤嘴（棕色） -->
+    <path
+        android:fillColor="#8D6E63"
+        android:pathData="M62,66 L68,64.8 L69,68.8 L63,70 Z"/>
+
+    <!-- ===== 烟雾（淡灰色曲线） ===== -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#B0BEC5"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M88,60 Q84,50 90,42 Q96,34 88,24"/>
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#90B0BEC5"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M90,58 Q96,48 90,40 Q84,32 92,20"/>
+
+</vector>

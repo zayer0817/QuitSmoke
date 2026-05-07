@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 状态栏底部渐变遮罩：从背景色渐变到透明，让状态栏与内容有层次感 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="@color/bg_main"
+        android:endColor="@android:color/transparent"
+        android:angle="270" />
+</shape>

@@ -1,0 +1,106 @@
+package com.quitsmoke.app.data
+
+import androidx.lifecycle.LiveData
+import androidx.room.*
+
+/**
+ * 抽烟记录的DAO接口
+ */
+@Dao
+interface SmokeRecordDao {
+
+    /** 插入一条记录 */
+    @Insert
+    suspend fun insert(record: SmokeRecord): Long
+
+    /** 删除一条记录（用于撤销操作） */
+    @Delete
+    suspend fun delete(record: SmokeRecord)
+
+    /** 删除指定ID的记录 */
+    @Query("DELETE FROM smoke_records WHERE id = :id")
+    suspend fun deleteById(id: Long)
+
+    /** 获取今天所有记录 */
+    @Query("SELECT * FROM smoke_records WHERE dateStr = :dateStr ORDER BY timestamp DESC")
+    suspend fun getRecordsByDate(dateStr: String): List<SmokeRecord>
+
+    /** 获取今天记录数 */
+    @Query("SELECT COUNT(*) FROM smoke_records WHERE dateStr = :dateStr")
+    suspend fun getCountByDate(dateStr: String): Int
+
+    /** 获取今天记录数（LiveData，用于小组件和UI实时更新） */
+    @Query("SELECT COUNT(*) FROM smoke_records WHERE dateStr = :dateStr")
+    fun getCountByDateLive(dateStr: String): LiveData<Int>
+
+    /** 获取最近N天的每日统计 */
+    @Query("""
+        SELECT dateStr, COUNT(*) as count 
+        FROM smoke_records 
+        WHERE timestamp >= :startTimestamp 
+        GROUP BY dateStr 
+        ORDER BY dateStr ASC
+    """)
+    suspend fun getDailyStats(startTimestamp: Long): List<DailyStat>
+
+    /** 获取最近一条记录（用于撤销） */
+    @Query("SELECT * FROM smoke_records ORDER BY timestamp DESC LIMIT 1")
+    suspend fun getLatestRecord(): SmokeRecord?
+
+    /** 获取所有记录，按时间倒序 */
+    @Query("SELECT * FROM smoke_records ORDER BY timestamp DESC")
+    fun getAllRecordsLive(): LiveData<List<SmokeRecord>>
+
+    /** 获取按时段分布统计（最近30天） */
+    @Query("""
+        SELECT hourOfDay, COUNT(*) as count 
+        FROM smoke_records 
+        WHERE timestamp >= :startTimestamp 
+        GROUP BY hourOfDay 
+        ORDER BY hourOfDay ASC
+    """)
+    suspend fun getHourlyDistribution(startTimestamp: Long): List<HourlyStat>
+
+    /** 获取总记录数 */
+    @Query("SELECT COUNT(*) FROM smoke_records")
+    suspend fun getTotalCount(): Int
+
+    /** 获取所有记录用于导出 */
+    @Query("SELECT * FROM smoke_records ORDER BY timestamp ASC")
+    suspend fun getAllRecords(): List<SmokeRecord>
+
+    /** 批量插入记录（用于导入） */
+    @Insert
+    suspend fun insertAll(records: List<SmokeRecord>): List<Long>
+
+    /** 获取连续0根天数（从今天往前数） */
+    @Query("""
+        WITH dates AS (
+            SELECT DISTINCT dateStr FROM smoke_records
+        )
+        SELECT COUNT(*) FROM (
+            SELECT dateStr 
+            FROM (
+                SELECT dateStr, date(dateStr) as d
+                FROM dates
+            )
+        )
+    """)
+    suspend fun getSmokingDaysCount(): Int
+}
+
+/**
+ * 每日统计结果
+ */
+data class DailyStat(
+    val dateStr: String,
+    val count: Int
+)
+
+/**
+ * 时段统计结果
+ */
+data class HourlyStat(
+    val hourOfDay: Int,
+    val count: Int
+)

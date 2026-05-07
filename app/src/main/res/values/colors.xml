@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 浅色模式颜色 -->
+<resources>
+    <color name="bg_main">#F5F5FA</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="text_primary">#1A1A2E</color>
+    <color name="text_secondary">#666680</color>
+    <color name="text_hint">#9999AA</color>
+    <color name="green_good">#4CAF50</color>
+    <color name="yellow_warn">#FFC107</color>
+    <color name="orange_alert">#FF9800</color>
+    <color name="red_danger">#F44336</color>
+    <color name="red_dark">#B71C1C</color>
+    <color name="btn_smoke_start">#FF6B6B</color>
+    <color name="btn_smoke_end">#EE5A24</color>
+    <color name="teal_calm">#00897B</color>
+    <color name="btn_secondary_bg">#1A1A2E1A</color>
+    <color name="widget_bg">#99FFFFFF</color>
+    <color name="status_bar">#F5F5FA</color>
+    <color name="nav_bar">#F5F5FA</color>
+    <color name="bar_highlight_stroke">#4A4A5A</color>
+</resources>

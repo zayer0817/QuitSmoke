@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/card_background"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="14dp"
+    android:layout_marginBottom="8dp">
+
+    <!-- 序号 -->
+    <TextView
+        android:id="@+id/tv_detail_index"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="56dp"
+        android:textColor="@color/text_secondary"
+        android:textSize="13sp" />
+
+    <!-- 时间（居中） -->
+    <TextView
+        android:id="@+id/tv_detail_time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="@color/text_primary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:fontFamily="monospace" />
+
+    <!-- 备注（可选） -->
+    <TextView
+        android:id="@+id/tv_detail_note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_hint"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+</LinearLayout>

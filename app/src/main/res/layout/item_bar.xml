@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 柱状图每一列的布局 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingStart="2dp"
+    android:paddingEnd="2dp">
+
+    <!-- 数量标签 -->
+    <TextView
+        android:id="@+id/tv_bar_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_secondary"
+        android:textSize="10sp"
+        android:layout_marginBottom="4dp" />
+
+    <!-- 柱子 -->
+    <View
+        android:id="@+id/view_bar"
+        android:layout_width="24dp"
+        android:layout_height="4dp"
+        android:background="#4CAF50" />
+
+    <!-- 日期标签 -->
+    <TextView
+        android:id="@+id/tv_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/text_hint"
+        android:textSize="10sp" />
+</LinearLayout>
