@@ -3,7 +3,7 @@
 [![Build & Release APK](https://github.com/zayer0817/QuitSmoke/actions/workflows/build.yml/badge.svg)](https://github.com/zayer0817/QuitSmoke/actions/workflows/build.yml)
 [![Release](https://img.shields.io/github/v/release/zayer0817/QuitSmoke?include_prereleases&label=download)](https://github.com/zayer0817/QuitSmoke/releases)
 
-> 极简记录，数据说话，辅助你逐步戒烟。
+> 极简记录，数据说话，统计你的抽烟日常，至于戒烟？随他去吧我们都只活一次。
 
 ---
 
