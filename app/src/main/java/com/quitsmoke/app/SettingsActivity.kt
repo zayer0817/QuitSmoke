@@ -210,7 +210,7 @@ class SettingsActivity : BaseActivity() {
                 }
 
                 if (summary.insertedCount > 0) {
-                    SmokeWidgetProvider().notifyWidgetUpdate(this@SettingsActivity)
+                    SmokeWidgetProvider.notifyWidgetUpdate(this@SettingsActivity)
                 }
                 showDataResult(
                     "导入完成：新增 ${summary.insertedCount} 条，跳过重复 ${summary.duplicateCount} 条，无效 ${summary.invalidCount} 条"

@@ -117,7 +117,7 @@ class AddRecordActivity : BaseActivity() {
 
         lifecycleScope.launch {
             repo.insertRecord(record)
-            SmokeWidgetProvider().notifyWidgetUpdate(this@AddRecordActivity)
+            SmokeWidgetProvider.notifyWidgetUpdate(this@AddRecordActivity)
             Toast.makeText(
                 this@AddRecordActivity,
                 "已添加：$dateStr ${tvSelectedTime.text}",

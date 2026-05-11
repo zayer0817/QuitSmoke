@@ -316,6 +316,6 @@ class MainActivity : BaseActivity() {
     }
 
     private fun notifyWidgetUpdate() {
-        SmokeWidgetProvider().notifyWidgetUpdate(this)
+        SmokeWidgetProvider.notifyWidgetUpdate(this)
     }
 }

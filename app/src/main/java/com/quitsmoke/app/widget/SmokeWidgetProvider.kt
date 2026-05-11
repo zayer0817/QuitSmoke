@@ -6,7 +6,6 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.view.View
 import android.widget.RemoteViews
 import com.quitsmoke.app.MainActivity
 import com.quitsmoke.app.R
@@ -29,6 +28,18 @@ class SmokeWidgetProvider : AppWidgetProvider() {
     companion object {
         /** 通知小组件更新的Action */
         const val ACTION_UPDATE_WIDGET = "com.quitsmoke.app.ACTION_UPDATE_WIDGET"
+
+        /**
+         * 通知所有小组件更新
+         * 在记录或撤销后调用（静态方法，无需实例化）
+         */
+        fun notifyWidgetUpdate(context: Context) {
+            val intent = Intent(context, SmokeWidgetProvider::class.java).apply {
+                action = ACTION_UPDATE_WIDGET
+                setPackage(context.packageName)
+            }
+            context.sendBroadcast(intent)
+        }
     }
 
     override fun onUpdate(
@@ -72,7 +83,6 @@ class SmokeWidgetProvider : AppWidgetProvider() {
         views.setTextViewText(R.id.tv_today_count, "$todayCount")
 
         // 根据数量调整提示文字
-        @Suppress("UNUSED_VARIABLE")
         val tipText = when {
             todayCount == 0 -> "今天还没有抽烟，坚持住！"
             todayCount <= 5 -> "还行，控制住自己"
@@ -104,17 +114,5 @@ class SmokeWidgetProvider : AppWidgetProvider() {
         views.setOnClickPendingIntent(R.id.layout_count_area, openPending)
 
         return views
-    }
-
-    /**
-     * 通知所有小组件更新
-     * 在记录或撤销后调用
-     */
-    fun notifyWidgetUpdate(context: Context) {
-        val intent = Intent(context, SmokeWidgetProvider::class.java).apply {
-            action = ACTION_UPDATE_WIDGET
-            setPackage(context.packageName)
-        }
-        context.sendBroadcast(intent)
     }
 }

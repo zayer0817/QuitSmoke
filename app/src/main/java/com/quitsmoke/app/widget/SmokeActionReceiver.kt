@@ -49,7 +49,7 @@ class SmokeActionReceiver : BroadcastReceiver() {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
 
                 // 通知小组件更新
-                SmokeWidgetProvider().notifyWidgetUpdate(context)
+                SmokeWidgetProvider.notifyWidgetUpdate(context)
             }
         }
     }
@@ -69,7 +69,7 @@ class SmokeActionReceiver : BroadcastReceiver() {
                 } else {
                     Toast.makeText(context, "没有可撤销的记录", Toast.LENGTH_SHORT).show()
                 }
-                SmokeWidgetProvider().notifyWidgetUpdate(context)
+                SmokeWidgetProvider.notifyWidgetUpdate(context)
             }
         }
     }
