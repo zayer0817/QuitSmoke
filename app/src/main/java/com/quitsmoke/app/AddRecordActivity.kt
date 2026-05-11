@@ -5,6 +5,7 @@ import android.app.TimePickerDialog
 import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.quitsmoke.app.data.SmokeRecord
 import com.quitsmoke.app.data.SmokeRepository
@@ -22,9 +23,11 @@ class AddRecordActivity : BaseActivity() {
     private lateinit var repo: SmokeRepository
     private lateinit var tvSelectedDate: TextView
     private lateinit var tvSelectedTime: TextView
+    private lateinit var tvSelectedReason: TextView
     private lateinit var tvConfirm: TextView
 
     private val calendar = Calendar.getInstance()
+    private var selectedReason: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         ThemeHelper.init(this)
@@ -35,6 +38,7 @@ class AddRecordActivity : BaseActivity() {
 
         tvSelectedDate = findViewById(R.id.tv_selected_date)
         tvSelectedTime = findViewById(R.id.tv_selected_time)
+        tvSelectedReason = findViewById(R.id.tv_selected_reason)
         tvConfirm = findViewById(R.id.btn_confirm_add)
 
         // 默认显示当前日期时间
@@ -56,6 +60,10 @@ class AddRecordActivity : BaseActivity() {
             showTimePicker()
         }
 
+        findViewById<TextView>(R.id.btn_pick_reason).setOnClickListener {
+            showReasonPicker()
+        }
+
         // 确认添加
         tvConfirm.setOnClickListener {
             saveRecord()
@@ -75,6 +83,21 @@ class AddRecordActivity : BaseActivity() {
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         ).show()
+    }
+
+    private fun showReasonPicker() {
+        val reasons = arrayOf("饭后", "压力", "社交", "无聊", "习惯", "其他")
+        AlertDialog.Builder(this)
+            .setTitle("选择触发原因")
+            .setItems(reasons) { _, which ->
+                selectedReason = reasons[which]
+                tvSelectedReason.text = selectedReason
+            }
+            .setNegativeButton("清除") { _, _ ->
+                selectedReason = ""
+                tvSelectedReason.text = "未选择"
+            }
+            .show()
     }
 
     private fun showTimePicker() {
@@ -112,7 +135,7 @@ class AddRecordActivity : BaseActivity() {
             timestamp = timestamp,
             dateStr = dateStr,
             hourOfDay = hourOfDay,
-            note = ""
+            note = selectedReason
         )
 
         lifecycleScope.launch {

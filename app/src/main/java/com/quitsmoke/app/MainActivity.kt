@@ -1,13 +1,15 @@
 package com.quitsmoke.app
 
 import android.content.Intent
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
-import com.quitsmoke.app.data.SmokeRepository
 import com.quitsmoke.app.data.DailyStat
+import com.quitsmoke.app.data.GoalReport
+import com.quitsmoke.app.data.SmokeRepository
 import com.quitsmoke.app.widget.SmokeWidgetProvider
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -30,10 +32,14 @@ class MainActivity : BaseActivity() {
     // 视图引用
     private lateinit var tvTodayCount: TextView
     private lateinit var tvTodayTip: TextView
+    private lateinit var tvTodayTarget: TextView
     private lateinit var btnSmoke: View
     private lateinit var btnUndo: View
     private lateinit var btnAddManual: View
     private lateinit var btnSettings: View
+    private lateinit var tvGoalStreak: TextView
+    private lateinit var tvNoSmokeStreak: TextView
+    private lateinit var tvMonthSummary: TextView
     private lateinit var tvWeekTotal: TextView
     private lateinit var tvWeekAvg: TextView
     private lateinit var tvTrend: TextView
@@ -62,10 +68,14 @@ class MainActivity : BaseActivity() {
     private fun initViews() {
         tvTodayCount = findViewById(R.id.tv_today_count)
         tvTodayTip = findViewById(R.id.tv_today_tip)
+        tvTodayTarget = findViewById(R.id.tv_today_target)
         btnSmoke = findViewById(R.id.btn_smoke_main)
         btnUndo = findViewById(R.id.btn_undo)
         btnAddManual = findViewById(R.id.btn_add_manual)
         btnSettings = findViewById(R.id.btn_settings)
+        tvGoalStreak = findViewById(R.id.tv_goal_streak)
+        tvNoSmokeStreak = findViewById(R.id.tv_no_smoke_streak)
+        tvMonthSummary = findViewById(R.id.tv_month_summary)
         tvWeekTotal = findViewById(R.id.tv_week_total)
         tvWeekAvg = findViewById(R.id.tv_week_avg)
         tvTrend = findViewById(R.id.tv_trend)
@@ -108,8 +118,12 @@ class MainActivity : BaseActivity() {
 
     private fun loadData() {
         lifecycleScope.launch {
+            val dailyTarget = GoalPreferences.getDailyTarget(this@MainActivity)
             val todayCount = repo.getTodayCount()
-            updateTodaySection(todayCount)
+            updateTodaySection(todayCount, dailyTarget)
+
+            val goalReport = repo.getGoalReport(dailyTarget)
+            updateGoalSection(goalReport)
 
             val weekReport = repo.getWeekReport()
             updateWeekSection(weekReport)
@@ -126,11 +140,18 @@ class MainActivity : BaseActivity() {
     /**
      * 更新今日区域
      */
-    private fun updateTodaySection(count: Int) {
+    private fun updateTodaySection(count: Int, dailyTarget: Int) {
         tvTodayCount.text = count.toString()
+        val remaining = (dailyTarget - count).coerceAtLeast(0)
+        tvTodayTarget.text = if (count <= dailyTarget) {
+            "目标 $count/$dailyTarget，还可 ${remaining} 根"
+        } else {
+            "目标 $count/$dailyTarget，已超出 ${count - dailyTarget} 根"
+        }
 
         val (tip, color) = when {
             count == 0 -> "今天还没有抽烟，坚持住！" to 0xFF4CAF50.toInt()
+            count <= dailyTarget -> "仍在今日目标内，稳住节奏" to 0xFF4CAF50.toInt()
             count <= 5 -> "还行，控制住自己" to 0xFFFFC107.toInt()
             count <= 10 -> "有点多了，注意控制" to 0xFFFF9800.toInt()
             count <= 20 -> "太多了，要克制！" to 0xFFF44336.toInt()
@@ -138,6 +159,15 @@ class MainActivity : BaseActivity() {
         }
         tvTodayTip.text = tip
         tvTodayTip.setTextColor(color)
+        tvTodayTarget.setTextColor(if (count <= dailyTarget) 0xFF4CAF50.toInt() else 0xFFF44336.toInt())
+    }
+
+    private fun updateGoalSection(report: GoalReport) {
+        tvGoalStreak.text = "${report.targetStreak} 天"
+        tvNoSmokeStreak.text = "${report.noSmokeStreak} 天"
+        tvMonthSummary.text =
+            "本月 ${report.monthTotal} 根，日均 ${report.monthAvgDaily} 根/天\n" +
+                "${report.monthDaysElapsed} 天中达标 ${report.monthTargetDays} 天，无烟 ${report.monthSmokeFreeDays} 天"
     }
 
     /**
@@ -199,12 +229,7 @@ class MainActivity : BaseActivity() {
                 stat.count <= 20 -> 0xFFFF9800.toInt()
                 else -> 0xFFF44336.toInt()
             }
-            barView.setBackgroundColor(barColor)
-
-            // 如果是今天，加高亮边框
-            if (stat.dateStr == todayStr) {
-                barView.setBackgroundResource(R.drawable.bar_today_bg)
-            }
+            barView.background = createBarBackground(barColor, stat.dateStr == todayStr)
 
             // 日期标签
             try {
@@ -317,5 +342,19 @@ class MainActivity : BaseActivity() {
 
     private fun notifyWidgetUpdate() {
         SmokeWidgetProvider.notifyWidgetUpdate(this)
+    }
+
+    private fun createBarBackground(color: Int, isToday: Boolean): GradientDrawable {
+        return GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 4f * resources.displayMetrics.density
+            setColor(color)
+            if (isToday) {
+                setStroke(
+                    (2f * resources.displayMetrics.density).toInt().coerceAtLeast(1),
+                    resources.getColor(R.color.bar_highlight_stroke, theme)
+                )
+            }
+        }
     }
 }

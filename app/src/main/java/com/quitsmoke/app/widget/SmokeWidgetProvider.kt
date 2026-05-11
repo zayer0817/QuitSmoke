@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
+import com.quitsmoke.app.GoalPreferences
 import com.quitsmoke.app.MainActivity
 import com.quitsmoke.app.R
 import com.quitsmoke.app.data.SmokeRepository
@@ -81,10 +82,12 @@ class SmokeWidgetProvider : AppWidgetProvider() {
 
         // 更新今日计数
         views.setTextViewText(R.id.tv_today_count, "$todayCount")
+        val dailyTarget = GoalPreferences.getDailyTarget(context)
 
         // 根据数量调整提示文字
         val tipText = when {
             todayCount == 0 -> "今天还没有抽烟，坚持住！"
+            todayCount <= dailyTarget -> "目标内，还可 ${(dailyTarget - todayCount).coerceAtLeast(0)} 根"
             todayCount <= 5 -> "还行，控制住自己"
             todayCount <= 10 -> "有点多了，注意控制"
             todayCount <= 20 -> "太多了，要克制！"

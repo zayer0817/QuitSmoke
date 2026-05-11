@@ -69,6 +69,16 @@ interface SmokeRecordDao {
     @Query("SELECT * FROM smoke_records ORDER BY timestamp ASC")
     suspend fun getAllRecords(): List<SmokeRecord>
 
+    /** 获取指定时间之后的所有每日统计 */
+    @Query("""
+        SELECT dateStr, COUNT(*) as count
+        FROM smoke_records
+        WHERE timestamp >= :startTimestamp
+        GROUP BY dateStr
+        ORDER BY dateStr ASC
+    """)
+    suspend fun getDailyStatsSince(startTimestamp: Long): List<DailyStat>
+
     /** 批量插入记录（用于导入） */
     @Insert
     suspend fun insertAll(records: List<SmokeRecord>): List<Long>

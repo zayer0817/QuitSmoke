@@ -63,7 +63,6 @@
             <intent-filter>
                 <action android:name="com.quitsmoke.app.ACTION_SMOKE" />
                 <action android:name="com.quitsmoke.app.ACTION_UNDO" />
-                <action android:name="com.quitsmoke.app.ACTION_OPEN_APP" />
             </intent-filter>
         </receiver>
 

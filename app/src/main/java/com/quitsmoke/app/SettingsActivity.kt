@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.quitsmoke.app.data.SmokeRecord
@@ -34,11 +35,15 @@ class SettingsActivity : BaseActivity() {
     private lateinit var tvThemeMode: TextView
     private lateinit var tvExportResult: TextView
     private lateinit var tvAppVersion: TextView
+    private lateinit var tvDailyTarget: TextView
+    private lateinit var tvTotalRecords: TextView
 
     // 主题按钮
     private lateinit var btnThemeSystem: TextView
     private lateinit var btnThemeLight: TextView
     private lateinit var btnThemeDark: TextView
+    private lateinit var btnTargetMinus: TextView
+    private lateinit var btnTargetPlus: TextView
 
     // 导出导入按钮
     private lateinit var btnExport: TextView
@@ -69,15 +74,21 @@ class SettingsActivity : BaseActivity() {
         initViews()
         setupListeners()
         updateThemeUI()
+        updateGoalUI()
+        loadDataSummary()
     }
 
     private fun initViews() {
         tvThemeMode = findViewById(R.id.tv_theme_mode)
         tvExportResult = findViewById(R.id.tv_export_result)
         tvAppVersion = findViewById(R.id.tv_app_version)
+        tvDailyTarget = findViewById(R.id.tv_daily_target)
+        tvTotalRecords = findViewById(R.id.tv_total_records)
         btnThemeSystem = findViewById(R.id.btn_theme_system)
         btnThemeLight = findViewById(R.id.btn_theme_light)
         btnThemeDark = findViewById(R.id.btn_theme_dark)
+        btnTargetMinus = findViewById(R.id.btn_target_minus)
+        btnTargetPlus = findViewById(R.id.btn_target_plus)
         btnExport = findViewById(R.id.btn_export)
         btnImport = findViewById(R.id.btn_import)
 
@@ -99,6 +110,9 @@ class SettingsActivity : BaseActivity() {
         btnThemeSystem.setOnClickListener { switchTheme(ThemeHelper.MODE_SYSTEM) }
         btnThemeLight.setOnClickListener { switchTheme(ThemeHelper.MODE_LIGHT) }
         btnThemeDark.setOnClickListener { switchTheme(ThemeHelper.MODE_DARK) }
+
+        btnTargetMinus.setOnClickListener { adjustDailyTarget(-1) }
+        btnTargetPlus.setOnClickListener { adjustDailyTarget(1) }
 
         // 数据导出
         btnExport.setOnClickListener { exportData() }
@@ -134,6 +148,27 @@ class SettingsActivity : BaseActivity() {
         btnThemeSystem.setTextColor(if (currentMode == ThemeHelper.MODE_SYSTEM) activeTextColor else inactiveTextColor)
         btnThemeLight.setTextColor(if (currentMode == ThemeHelper.MODE_LIGHT) activeTextColor else inactiveTextColor)
         btnThemeDark.setTextColor(if (currentMode == ThemeHelper.MODE_DARK) activeTextColor else inactiveTextColor)
+    }
+
+    private fun adjustDailyTarget(delta: Int) {
+        val current = GoalPreferences.getDailyTarget(this)
+        GoalPreferences.setDailyTarget(this, current + delta)
+        updateGoalUI()
+        SmokeWidgetProvider.notifyWidgetUpdate(this)
+    }
+
+    private fun updateGoalUI() {
+        val target = GoalPreferences.getDailyTarget(this)
+        tvDailyTarget.text = "目标：$target 根/天"
+    }
+
+    private fun loadDataSummary() {
+        lifecycleScope.launch {
+            val total = withContext(Dispatchers.IO) {
+                repo.getTotalCount()
+            }
+            tvTotalRecords.text = "当前记录：$total 条"
+        }
     }
 
     // ========== 数据导出 ==========
@@ -199,22 +234,49 @@ class SettingsActivity : BaseActivity() {
     private fun performImport(uri: Uri) {
         lifecycleScope.launch {
             try {
-                val summary = withContext(Dispatchers.IO) {
+                val preview = withContext(Dispatchers.IO) {
                     val readResult = readImportedRecords(uri)
-                    val insertedCount = repo.insertRecords(readResult.records)
-                    ImportSummary(
-                        insertedCount = insertedCount,
-                        duplicateCount = readResult.records.size - insertedCount,
+                    val insertableCount = repo.previewInsertRecords(readResult.records)
+                    ImportPreview(
+                        records = readResult.records,
+                        insertableCount = insertableCount,
+                        duplicateCount = readResult.records.size - insertableCount,
                         invalidCount = readResult.invalidCount
                     )
                 }
+                showImportConfirm(preview)
+            } catch (e: Exception) {
+                showDataResult("导入失败：${e.message}")
+            }
+        }
+    }
 
-                if (summary.insertedCount > 0) {
+    private fun showImportConfirm(preview: ImportPreview) {
+        AlertDialog.Builder(this)
+            .setTitle("确认导入")
+            .setMessage(
+                "将新增 ${preview.insertableCount} 条记录\n" +
+                    "跳过重复 ${preview.duplicateCount} 条\n" +
+                    "无效记录 ${preview.invalidCount} 条"
+            )
+            .setNegativeButton("取消", null)
+            .setPositiveButton("导入") { _, _ ->
+                confirmImport(preview.records)
+            }
+            .show()
+    }
+
+    private fun confirmImport(records: List<SmokeRecord>) {
+        lifecycleScope.launch {
+            try {
+                val insertedCount = withContext(Dispatchers.IO) {
+                    repo.insertRecords(records)
+                }
+                if (insertedCount > 0) {
                     SmokeWidgetProvider.notifyWidgetUpdate(this@SettingsActivity)
                 }
-                showDataResult(
-                    "导入完成：新增 ${summary.insertedCount} 条，跳过重复 ${summary.duplicateCount} 条，无效 ${summary.invalidCount} 条"
-                )
+                loadDataSummary()
+                showDataResult("导入完成：新增 $insertedCount 条")
             } catch (e: Exception) {
                 showDataResult("导入失败：${e.message}")
             }
@@ -377,8 +439,9 @@ class SettingsActivity : BaseActivity() {
         val invalidCount: Int
     )
 
-    private data class ImportSummary(
-        val insertedCount: Int,
+    private data class ImportPreview(
+        val records: List<SmokeRecord>,
+        val insertableCount: Int,
         val duplicateCount: Int,
         val invalidCount: Int
     )

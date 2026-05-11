@@ -68,6 +68,11 @@ class SmokeRepository private constructor(context: Context) {
         return dao.getCountByDate(getTodayStr())
     }
 
+    /** 获取总记录数 */
+    suspend fun getTotalCount(): Int {
+        return dao.getTotalCount()
+    }
+
     /** 获取今天记录数（LiveData） */
     fun getTodayCountLive(): LiveData<Int> {
         return dao.getCountByDateLive(getTodayStr())
@@ -107,8 +112,23 @@ class SmokeRepository private constructor(context: Context) {
         return dao.getAllRecords()
     }
 
+    /** 预览导入记录，返回实际会新增的记录数 */
+    suspend fun previewInsertRecords(records: List<SmokeRecord>): Int {
+        return findNewImportRecords(records).size
+    }
+
     /** 批量插入记录（用于导入），跳过已经存在的同一条记录 */
     suspend fun insertRecords(records: List<SmokeRecord>): Int {
+        val newRecords = findNewImportRecords(records)
+
+        if (newRecords.isNotEmpty()) {
+            dao.insertAll(newRecords)
+        }
+
+        return newRecords.size
+    }
+
+    private suspend fun findNewImportRecords(records: List<SmokeRecord>): List<SmokeRecord> {
         val uniqueRecords = records.distinctBy {
             ImportedRecordKey(
                 timestamp = it.timestamp,
@@ -130,11 +150,7 @@ class SmokeRepository private constructor(context: Context) {
             }
         }
 
-        if (newRecords.isNotEmpty()) {
-            dao.insertAll(newRecords)
-        }
-
-        return newRecords.size
+        return newRecords
     }
 
     /** 插入单条记录（手动添加） */
@@ -150,7 +166,6 @@ class SmokeRepository private constructor(context: Context) {
      */
     suspend fun getWeekReport(): WeekReport {
         val stats = getWeeklyStats()
-        val todayStr = getTodayStr()
 
         // 最近7天的数据
         val last7Days = mutableListOf<DailyStat>()
@@ -192,6 +207,84 @@ class SmokeRepository private constructor(context: Context) {
         )
     }
 
+    suspend fun getGoalReport(dailyTarget: Int): GoalReport {
+        val target = dailyTarget.coerceAtLeast(1)
+        val todayStr = getTodayStr()
+        val todayCount = getTodayCount()
+        val remaining = (target - todayCount).coerceAtLeast(0)
+
+        val targetStreak = getBackwardStreak { count -> count <= target }
+        val noSmokeStreak = getBackwardStreak { count -> count == 0 }
+        val monthReport = getMonthReport(target, todayStr)
+
+        return GoalReport(
+            dailyTarget = target,
+            todayCount = todayCount,
+            remaining = remaining,
+            targetStreak = targetStreak,
+            noSmokeStreak = noSmokeStreak,
+            monthTotal = monthReport.total,
+            monthAvgDaily = monthReport.avgDaily,
+            monthTargetDays = monthReport.targetDays,
+            monthSmokeFreeDays = monthReport.smokeFreeDays,
+            monthDaysElapsed = monthReport.daysElapsed
+        )
+    }
+
+    private suspend fun getBackwardStreak(matches: (Int) -> Boolean): Int {
+        val calendar = Calendar.getInstance()
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        var streak = 0
+
+        repeat(365) {
+            val dateStr = sdf.format(calendar.time)
+            val count = dao.getCountByDate(dateStr)
+            if (!matches(count)) {
+                return streak
+            }
+            streak++
+            calendar.add(Calendar.DAY_OF_YEAR, -1)
+        }
+
+        return streak
+    }
+
+    private suspend fun getMonthReport(target: Int, todayStr: String): MonthReport {
+        val calendar = Calendar.getInstance()
+        val daysElapsed = calendar.get(Calendar.DAY_OF_MONTH)
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val stats = dao.getDailyStatsSince(calendar.timeInMillis)
+            .filter { it.dateStr <= todayStr }
+            .associateBy { it.dateStr }
+
+        var total = 0
+        var targetDays = 0
+        var smokeFreeDays = 0
+
+        repeat(daysElapsed) {
+            val dateStr = sdf.format(calendar.time)
+            val count = stats[dateStr]?.count ?: 0
+            total += count
+            if (count <= target) targetDays++
+            if (count == 0) smokeFreeDays++
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        return MonthReport(
+            total = total,
+            avgDaily = if (daysElapsed > 0) String.format(Locale.getDefault(), "%.1f", total / daysElapsed.toDouble()) else "0",
+            targetDays = targetDays,
+            smokeFreeDays = smokeFreeDays,
+            daysElapsed = daysElapsed
+        )
+    }
+
     private fun isToday(dateStr: String): Boolean {
         return dateStr == getTodayStr()
     }
@@ -214,4 +307,25 @@ data class WeekReport(
     val todayCount: Int,
     val trend: Int,       // 1=上升, -1=下降, 0=持平
     val prevWeekTotal: Int
+)
+
+data class GoalReport(
+    val dailyTarget: Int,
+    val todayCount: Int,
+    val remaining: Int,
+    val targetStreak: Int,
+    val noSmokeStreak: Int,
+    val monthTotal: Int,
+    val monthAvgDaily: String,
+    val monthTargetDays: Int,
+    val monthSmokeFreeDays: Int,
+    val monthDaysElapsed: Int
+)
+
+private data class MonthReport(
+    val total: Int,
+    val avgDaily: String,
+    val targetDays: Int,
+    val smokeFreeDays: Int,
+    val daysElapsed: Int
 )
