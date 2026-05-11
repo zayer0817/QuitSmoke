@@ -35,7 +35,7 @@ class SmokeActionReceiver : BroadcastReceiver() {
     private fun handleSmoke(context: Context) {
         CoroutineScope(Dispatchers.IO).launch {
             val repo = SmokeRepository.getInstance(context)
-            val record = repo.recordSmoke()
+            repo.recordSmoke()
             val todayCount = repo.getTodayCount()
 
             withContext(Dispatchers.Main) {

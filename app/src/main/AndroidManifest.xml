@@ -59,7 +59,7 @@
         <!-- 小组件点击广播接收器 -->
         <receiver
             android:name=".widget.SmokeActionReceiver"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.quitsmoke.app.ACTION_SMOKE" />
                 <action android:name="com.quitsmoke.app.ACTION_UNDO" />

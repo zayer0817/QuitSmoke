@@ -74,6 +74,23 @@
 
 ---
 
+### v1.2.2 — 数据管理与安全加固
+
+导入导出体验优化 + 小组件安全加固 + 版本信息自动同步
+
+| 改进 | 说明 |
+|------|------|
+| 导入导出 API 更新 | 使用 Activity Result API 替代 `startActivityForResult` |
+| CSV 兼容性增强 | 导入/导出支持逗号、双引号和换行内容 |
+| 重复导入防护 | 导入备份时自动跳过已存在的相同记录，避免数据翻倍 |
+| 导入结果提示 | 导入完成后显示新增、重复、无效记录数量 |
+| 小组件安全加固 | 小组件操作广播限制在应用内部，减少外部误触发风险 |
+| 小组件刷新补全 | 手动补录和导入数据后会主动刷新桌面小组件 |
+| 版本信息同步 | 设置页关于信息自动读取 `BuildConfig.VERSION_NAME` |
+| BuildConfig 显式启用 | Gradle 中显式开启 `buildConfig`，保证版本信息可用 |
+
+---
+
 ## 核心功能
 
 ### 🎯 桌面小组件
@@ -105,6 +122,12 @@
 ### ↩️ 撤销操作
 - 误按可撤销最近一次记录
 - 只能撤销今天的记录
+
+### 💾 数据管理
+- 在设置页导出 CSV 备份
+- 从 CSV 文件导入恢复记录
+- 重复导入同一个备份时会自动跳过已有记录
+- 导入后显示新增、重复、无效记录数量
 
 ---
 
@@ -168,7 +191,7 @@ QuitSmoke/
 
 ### 环境要求
 - Android Studio Hedgehog (2023.1.1) 或更高版本
-- JDK 17
+- JDK 17+（或 Android Studio 自带 JBR）
 - Android SDK 34
 - Gradle 8.2
 
@@ -224,8 +247,76 @@ QuitSmoke/
 | PendingIntent | 小组件交互 |
 | Coroutines | 异步操作 |
 | Material Design | UI组件 |
+| Activity Result API | 文件导入导出 |
 | BaseActivity | 统一沉浸式状态栏 |
 | WindowCompat | 状态栏兼容处理 |
+
+---
+
+## 常见问题
+
+### 命令行提示 `JAVA_HOME is not set`
+
+如果 Android Studio 能运行项目，但在 PowerShell 里执行 `.\gradlew.bat :app:assembleDebug` 报：
+
+```text
+ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+```
+
+说明当前命令行找不到 JDK。项目需要 JDK 17 或 Android Studio 自带的 JBR。
+
+#### 方案一：使用 Android Studio 自带 JDK
+
+1. 打开 Android Studio
+2. 进入 `File` → `Settings` → `Build, Execution, Deployment` → `Build Tools` → `Gradle`
+3. 查看 `Gradle JDK` 使用的路径
+4. 在 Windows 环境变量里新增：
+
+```text
+JAVA_HOME=C:\Program Files\Android\Android Studio\jbr
+```
+
+如果 Android Studio 安装在 D 盘，也可能是类似：
+
+```text
+JAVA_HOME=D:\Android\jbr
+```
+
+然后把下面这项加入 `Path`：
+
+```text
+%JAVA_HOME%\bin
+```
+
+关闭并重新打开 PowerShell，执行：
+
+```powershell
+java -version
+.\gradlew.bat :app:assembleDebug
+```
+
+#### 方案二：安装独立 JDK 17
+
+安装 Temurin JDK 17 或 Oracle JDK 17 后，把 `JAVA_HOME` 指向安装目录，例如：
+
+```text
+JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-17.x.x.x-hotspot
+```
+
+并把 `%JAVA_HOME%\bin` 加入 `Path`。
+
+#### 临时方案：只在当前 PowerShell 生效
+
+如果你只想临时跑一次构建，可以执行：
+
+```powershell
+$env:JAVA_HOME="D:\Android\jbr"
+$env:Path="$env:JAVA_HOME\bin;$env:Path"
+java -version
+.\gradlew.bat :app:assembleDebug
+```
+
+路径要替换成你电脑上真实存在的 JDK 目录。
 
 ---
 

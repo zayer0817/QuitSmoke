@@ -73,6 +73,22 @@ interface SmokeRecordDao {
     @Insert
     suspend fun insertAll(records: List<SmokeRecord>): List<Long>
 
+    /** 查找已存在的同一条导入记录 */
+    @Query("""
+        SELECT * FROM smoke_records
+        WHERE timestamp = :timestamp
+            AND dateStr = :dateStr
+            AND hourOfDay = :hourOfDay
+            AND note = :note
+        LIMIT 1
+    """)
+    suspend fun findDuplicate(
+        timestamp: Long,
+        dateStr: String,
+        hourOfDay: Int,
+        note: String
+    ): SmokeRecord?
+
     /** 获取连续0根天数（从今天往前数） */
     @Query("""
         WITH dates AS (

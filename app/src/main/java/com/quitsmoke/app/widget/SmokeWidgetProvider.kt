@@ -85,6 +85,7 @@ class SmokeWidgetProvider : AppWidgetProvider() {
         // "抽一根"按钮点击 -> 发送广播记录一次
         val smokeIntent = Intent(context, SmokeActionReceiver::class.java).apply {
             action = SmokeActionReceiver.ACTION_SMOKE
+            setPackage(context.packageName)
         }
         val smokePending = PendingIntent.getBroadcast(
             context, 0, smokeIntent,
@@ -112,6 +113,7 @@ class SmokeWidgetProvider : AppWidgetProvider() {
     fun notifyWidgetUpdate(context: Context) {
         val intent = Intent(context, SmokeWidgetProvider::class.java).apply {
             action = ACTION_UPDATE_WIDGET
+            setPackage(context.packageName)
         }
         context.sendBroadcast(intent)
     }

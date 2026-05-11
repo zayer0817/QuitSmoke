@@ -274,9 +274,10 @@
                 android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/tv_app_version"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="抽了吗 v1.1"
+                    android:text="抽了吗"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />

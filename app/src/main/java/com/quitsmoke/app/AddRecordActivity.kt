@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.quitsmoke.app.data.SmokeRecord
 import com.quitsmoke.app.data.SmokeRepository
+import com.quitsmoke.app.widget.SmokeWidgetProvider
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -116,6 +117,7 @@ class AddRecordActivity : BaseActivity() {
 
         lifecycleScope.launch {
             repo.insertRecord(record)
+            SmokeWidgetProvider().notifyWidgetUpdate(this@AddRecordActivity)
             Toast.makeText(
                 this@AddRecordActivity,
                 "已添加：$dateStr ${tvSelectedTime.text}",

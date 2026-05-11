@@ -107,9 +107,34 @@ class SmokeRepository private constructor(context: Context) {
         return dao.getAllRecords()
     }
 
-    /** 批量插入记录（用于导入） */
-    suspend fun insertRecords(records: List<SmokeRecord>) {
-        dao.insertAll(records)
+    /** 批量插入记录（用于导入），跳过已经存在的同一条记录 */
+    suspend fun insertRecords(records: List<SmokeRecord>): Int {
+        val uniqueRecords = records.distinctBy {
+            ImportedRecordKey(
+                timestamp = it.timestamp,
+                dateStr = it.dateStr,
+                hourOfDay = it.hourOfDay,
+                note = it.note
+            )
+        }
+        val newRecords = mutableListOf<SmokeRecord>()
+        for (record in uniqueRecords) {
+            val duplicate = dao.findDuplicate(
+                timestamp = record.timestamp,
+                dateStr = record.dateStr,
+                hourOfDay = record.hourOfDay,
+                note = record.note
+            )
+            if (duplicate == null) {
+                newRecords.add(record)
+            }
+        }
+
+        if (newRecords.isNotEmpty()) {
+            dao.insertAll(newRecords)
+        }
+
+        return newRecords.size
     }
 
     /** 插入单条记录（手动添加） */
@@ -171,6 +196,13 @@ class SmokeRepository private constructor(context: Context) {
         return dateStr == getTodayStr()
     }
 }
+
+private data class ImportedRecordKey(
+    val timestamp: Long,
+    val dateStr: String,
+    val hourOfDay: Int,
+    val note: String
+)
 
 /**
  * 周报数据类
