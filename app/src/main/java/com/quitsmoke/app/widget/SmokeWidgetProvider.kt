@@ -13,6 +13,7 @@ import com.quitsmoke.app.R
 import com.quitsmoke.app.data.SmokeRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 /**
@@ -49,7 +50,7 @@ class SmokeWidgetProvider : AppWidgetProvider() {
         appWidgetIds: IntArray
     ) {
         // 异步获取数据后更新所有小组件
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             val repo = SmokeRepository.getInstance(context)
             val todayCount = repo.getTodayCount()
 

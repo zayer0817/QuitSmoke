@@ -163,33 +163,43 @@ class SmokeRepository private constructor(context: Context) {
     /**
      * 获取周报数据
      * 返回最近7天每天的抽烟次数
+     *
+     * 优化：直接查询7天范围，不再查30天再过滤
      */
     suspend fun getWeekReport(): WeekReport {
-        val stats = getWeeklyStats()
-
-        // 最近7天的数据
-        val last7Days = mutableListOf<DailyStat>()
-        val calendar = Calendar.getInstance()
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val calendar = Calendar.getInstance()
 
+        // 本周：今天和前6天
+        val endDate = sdf.format(calendar.time)
+        calendar.add(Calendar.DAY_OF_YEAR, -6)
+        val startDate = sdf.format(calendar.time)
+
+        // 一次查询获取7天数据
+        val statsMap = dao.getDailyStatsRange(startDate, endDate)
+            .associateBy { it.dateStr }
+
+        val last7Days = mutableListOf<DailyStat>()
+        val cal = Calendar.getInstance()
         for (i in 6 downTo 0) {
-            calendar.time = Date()
-            calendar.add(Calendar.DAY_OF_YEAR, -i)
-            val dateStr = sdf.format(calendar.time)
-            val stat = stats.find { it.dateStr == dateStr }
-            last7Days.add(DailyStat(dateStr, stat?.count ?: 0))
+            cal.time = Date()
+            cal.add(Calendar.DAY_OF_YEAR, -i)
+            val dateStr = sdf.format(cal.time)
+            last7Days.add(DailyStat(dateStr, statsMap[dateStr]?.count ?: 0))
         }
 
         val totalWeek = last7Days.sumOf { it.count }
         val avgDaily = if (totalWeek > 0) String.format("%.1f", totalWeek / 7.0) else "0"
         val todayCount = last7Days.last().count
 
-        // 计算与上周对比
-        val calendar2 = Calendar.getInstance()
-        calendar2.add(Calendar.DAY_OF_YEAR, -13)
-        val prevWeekStats = dao.getDailyStats(calendar2.timeInMillis)
-            .filter { it.dateStr < last7Days.first().dateStr }
+        // 上周：精确查询7天范围
+        val cal2 = Calendar.getInstance()
+        cal2.add(Calendar.DAY_OF_YEAR, -13)
+        val prevEnd = sdf.format(cal2.apply { add(Calendar.DAY_OF_YEAR, 6) }.time)
+        val prevStart = sdf.format(cal2.apply { add(Calendar.DAY_OF_YEAR, -6) }.time)
+        val prevWeekStats = dao.getDailyStatsRange(prevStart, prevEnd)
         val prevWeekTotal = prevWeekStats.sumOf { it.count }
+
         val trend = when {
             prevWeekTotal == 0 -> if (totalWeek > 0) 1 else 0
             totalWeek > prevWeekTotal -> 1     // 上升
@@ -231,19 +241,34 @@ class SmokeRepository private constructor(context: Context) {
         )
     }
 
+    /**
+     * 从今天往前数，计算连续满足条件的天数
+     *
+     * 优化：一次 SQL 查询获取最近365天数据（降序），在内存中遍历，
+     * 替代原来循环365次 SQL 的做法。
+     */
     private suspend fun getBackwardStreak(matches: (Int) -> Boolean): Int {
         val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, -364) // 365天前
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val statsMap = dao.getDailyStatsDesc(calendar.timeInMillis)
+            .associateBy { it.dateStr }
+
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         var streak = 0
 
         repeat(365) {
-            val dateStr = sdf.format(calendar.time)
-            val count = dao.getCountByDate(dateStr)
+            val cal = Calendar.getInstance()
+            cal.add(Calendar.DAY_OF_YEAR, -it)
+            val dateStr = sdf.format(cal.time)
+            val count = statsMap[dateStr]?.count ?: 0
             if (!matches(count)) {
                 return streak
             }
             streak++
-            calendar.add(Calendar.DAY_OF_YEAR, -1)
         }
 
         return streak

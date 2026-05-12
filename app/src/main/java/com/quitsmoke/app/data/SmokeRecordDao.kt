@@ -99,20 +99,31 @@ interface SmokeRecordDao {
         note: String
     ): SmokeRecord?
 
-    /** 获取连续0根天数（从今天往前数） */
+    /**
+     * 获取从指定时间戳到现在的每日统计（按日期降序）
+     * 用于 getBackwardStreak() 优化：一次查询代替循环
+     */
     @Query("""
-        WITH dates AS (
-            SELECT DISTINCT dateStr FROM smoke_records
-        )
-        SELECT COUNT(*) FROM (
-            SELECT dateStr 
-            FROM (
-                SELECT dateStr, date(dateStr) as d
-                FROM dates
-            )
-        )
+        SELECT dateStr, COUNT(*) as count
+        FROM smoke_records
+        WHERE timestamp >= :startTimestamp
+        GROUP BY dateStr
+        ORDER BY dateStr DESC
     """)
-    suspend fun getSmokingDaysCount(): Int
+    suspend fun getDailyStatsDesc(startTimestamp: Long): List<DailyStat>
+
+    /**
+     * 获取指定日期范围内的每日统计（两端都包含）
+     * 用于 getWeekReport() 优化：精确查询指定范围
+     */
+    @Query("""
+        SELECT dateStr, COUNT(*) as count
+        FROM smoke_records
+        WHERE dateStr >= :startDate AND dateStr <= :endDate
+        GROUP BY dateStr
+        ORDER BY dateStr ASC
+    """)
+    suspend fun getDailyStatsRange(startDate: String, endDate: String): List<DailyStat>
 }
 
 /**

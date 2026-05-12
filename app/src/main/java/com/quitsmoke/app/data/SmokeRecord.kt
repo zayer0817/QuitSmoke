@@ -22,8 +22,8 @@ data class SmokeRecord(
     /** 归属日期（格式：yyyy-MM-dd），方便按日查询 */
     val dateStr: String = "",
 
-    /** 记录所在的小时 (0-23)，用于分析时段分布 */
-    val hourOfDay: Int = 0,
+    /** 记录所在的小时 (0-23)，用于分析时段分布；-1 表示未设置 */
+    val hourOfDay: Int = -1,
 
     /** 备注（可选） */
     val note: String = ""

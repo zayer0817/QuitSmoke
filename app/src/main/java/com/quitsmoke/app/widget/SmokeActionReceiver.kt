@@ -8,6 +8,7 @@ import android.widget.Toast
 import com.quitsmoke.app.data.SmokeRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -36,7 +37,7 @@ class SmokeActionReceiver : BroadcastReceiver() {
      * 处理"抽一根"操作
      */
     private fun handleSmoke(context: Context, pendingResult: PendingResult) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
                 val repo = SmokeRepository.getInstance(context)
                 repo.recordSmoke()
@@ -65,7 +66,7 @@ class SmokeActionReceiver : BroadcastReceiver() {
      * 处理撤销操作
      */
     private fun handleUndo(context: Context, pendingResult: PendingResult) {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
                 val repo = SmokeRepository.getInstance(context)
                 val success = repo.undoLastSmoke()
