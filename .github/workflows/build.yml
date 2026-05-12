@@ -41,13 +41,13 @@ jobs:
       - name: Build Debug APK
         run: |
           set +e
-          ./gradlew assembleDebug --stacktrace 2>&1 | tee gradle-build.log
+          ./gradlew assembleDebug --no-daemon 2>&1 | tee gradle-build.log
           status=${PIPESTATUS[0]}
           if [ "$status" -ne 0 ]; then
-            echo "::group::Gradle failure tail"
-            tail -n 120 gradle-build.log
-            echo "::endgroup::"
-            echo "::error title=Gradle build failed::Open the Gradle failure tail group above for details."
+            echo "===== Gradle failure tail start ====="
+            tail -n 200 gradle-build.log
+            echo "===== Gradle failure tail end ====="
+            echo "::error title=Gradle build failed::See the Gradle failure tail printed above."
             exit "$status"
           fi
 
