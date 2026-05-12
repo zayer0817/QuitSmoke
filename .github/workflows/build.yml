@@ -47,18 +47,7 @@ jobs:
             echo "::group::Gradle failure tail"
             tail -n 120 gradle-build.log
             echo "::endgroup::"
-            {
-              echo "Gradle build failed. Last 80 log lines:"
-              tail -n 80 gradle-build.log
-            } > gradle-error.txt
-            message=$(python3 - <<'PY'
-from pathlib import Path
-text = Path("gradle-error.txt").read_text(errors="replace")
-text = text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-print(text)
-PY
-)
-            echo "::error title=Gradle build failed::$message"
+            echo "::error title=Gradle build failed::Open the Gradle failure tail group above for details."
             exit "$status"
           fi
 
