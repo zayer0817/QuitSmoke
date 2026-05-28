@@ -9,6 +9,27 @@
 
 ## 版本历史
 
+### v1.4.0 — 现代化重构
+
+ViewBinding + ViewModel + DataStore + 字符串资源化 + 单元测试
+
+| 改进 | 说明 |
+|------|------|
+| ViewBinding | 全面替换 `findViewById`，类型安全，消除空指针风险 |
+| ViewModel | 主界面引入 `MainViewModel` + `StateFlow`，正确处理配置变更 |
+| DataStore | `SharedPreferences` 迁移到 `DataStore`，类型安全且支持协程 |
+| 字符串资源化 | 所有硬编码中文移入 `strings.xml`，支持未来本地化 |
+| 颜色资源化 | Kotlin 中的硬编码颜色值改为引用颜色资源 |
+| 依赖清理 | 移除未使用的 `constraintlayout` 和 `work-runtime-ktx` |
+| 单元测试 | 新增 16 个 `SmokeRepository` 测试用例，覆盖核心业务逻辑 |
+| Room Schema | 开启 `exportSchema`，支持数据库迁移自动验证 |
+| 浅色模式修复 | 修复 ViewBinding 迁移后状态栏图标颜色未正确设置的问题 |
+| 偏好迁移 | 从旧版 `SharedPreferences` 自动迁移主题和每日目标，升级后不丢设置 |
+| 统计观察期 | 连续无烟、连续达标和周报只从开始使用/最早记录日计算，不再追溯到使用前 |
+| 小组件跨天刷新 | 小组件会在次日凌晨自动刷新，避免早上仍显示昨天计数 |
+
+---
+
 ### v1.3.1 — 稳定性与构建优化
 
 深色模式适配 + 统计查询优化 + Room/KSP 构建链整理
@@ -179,7 +200,9 @@ QuitSmoke/
 │       ├── AndroidManifest.xml
 │       ├── java/com/quitsmoke/app/
 │       │   ├── BaseActivity.kt              # Activity基类（沉浸式状态栏）
-│       │   ├── ThemeHelper.kt              # 主题辅助工具
+│       │   ├── AppPreferences.kt            # DataStore偏好设置（主题+目标）
+│       │   ├── MainViewModel.kt             # 主界面ViewModel
+│       │   ├── QuitSmokeApp.kt              # Application类（全局初始化）
 │       │   ├── MainActivity.kt             # 主页面（统计分析）
 │       │   ├── HistoryActivity.kt          # 历史记录页面
 │       │   ├── HistoryAdapter.kt           # 历史记录适配器
@@ -280,14 +303,15 @@ QuitSmoke/
 | 技术 | 用途 |
 |------|------|
 | Kotlin | 主开发语言 |
-| Room | 本地数据库 |
+| ViewBinding | 类型安全的视图绑定 |
+| ViewModel + StateFlow | 状态管理与配置变更处理 |
+| DataStore | 现代偏好设置存储 |
+| Room + KSP | 本地数据库与注解处理 |
 | AppWidgetProvider | 桌面小组件 |
-| PendingIntent | 小组件交互 |
 | Coroutines | 异步操作 |
 | Material Design | UI组件 |
 | Activity Result API | 文件导入导出 |
-| BaseActivity | 统一沉浸式状态栏 |
-| WindowCompat | 状态栏兼容处理 |
+| JUnit + MockK | 单元测试 |
 
 ---
 

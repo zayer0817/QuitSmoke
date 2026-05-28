@@ -19,7 +19,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:gravity="center"
-            android:text="←"
+            android:text="@string/btn_back"
             android:textColor="@color/text_primary"
             android:textSize="22sp"
             android:clickable="true"
@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="历史记录"
+            android:text="@string/title_history"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -40,7 +40,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="还没有记录，先从今天开始吧"
+        android:text="@string/history_empty"
         android:textColor="@color/text_hint"
         android:textSize="16sp"
         android:visibility="gone" />

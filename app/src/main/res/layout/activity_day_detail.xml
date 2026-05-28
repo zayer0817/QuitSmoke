@@ -19,7 +19,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:gravity="center"
-            android:text="←"
+            android:text="@string/btn_back"
             android:textColor="@color/text_primary"
             android:textSize="22sp"
             android:clickable="true"
@@ -30,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="记录详情"
+            android:text="@string/title_day_detail"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -43,7 +43,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="🎉 这一天没有抽烟记录"
+        android:text="@string/day_detail_empty"
         android:textColor="@color/text_hint"
         android:textSize="16sp"
         android:visibility="gone" />

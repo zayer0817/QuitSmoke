@@ -19,7 +19,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:gravity="center"
-            android:text="←"
+            android:text="@string/btn_back"
             android:textColor="@color/text_primary"
             android:textSize="22sp"
             android:clickable="true"
@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="手动添加记录"
+            android:text="@string/title_add_record"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -57,7 +57,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📅 日期"
+                    android:text="@string/label_date"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     android:layout_marginBottom="12dp" />
@@ -81,7 +81,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:text="选择日期"
+                    android:text="@string/btn_pick_date"
                     android:textColor="@color/text_primary"
                     android:textSize="15sp" />
             </LinearLayout>
@@ -98,7 +98,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🕐 时间"
+                    android:text="@string/label_time"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     android:layout_marginBottom="12dp" />
@@ -123,7 +123,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:text="选择时间"
+                    android:text="@string/btn_pick_time"
                     android:textColor="@color/text_primary"
                     android:textSize="15sp" />
             </LinearLayout>
@@ -140,7 +140,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🏷️ 触发原因"
+                    android:text="@string/label_trigger"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     android:layout_marginBottom="12dp" />
@@ -150,7 +150,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="未选择"
+                    android:text="@string/reason_not_selected"
                     android:textColor="@color/text_primary"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -164,7 +164,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:text="选择原因"
+                    android:text="@string/btn_pick_reason"
                     android:textColor="@color/text_primary"
                     android:textSize="15sp" />
             </LinearLayout>
@@ -173,7 +173,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="💡 手动添加的记录会计入当天统计，也会在历史记录中显示"
+                android:text="@string/add_record_tip"
                 android:textColor="@color/text_hint"
                 android:textSize="13sp"
                 android:lineSpacingExtra="4dp"
@@ -188,7 +188,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center"
-                android:text="✓ 确认添加"
+                android:text="@string/btn_confirm_add"
                 android:textColor="#FFFFFF"
                 android:textSize="17sp"
                 android:textStyle="bold" />

@@ -2,48 +2,38 @@ package com.quitsmoke.app
 
 import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.quitsmoke.app.data.DailyStat
+import com.quitsmoke.app.databinding.ItemHistoryBinding
 
-/**
- * 历史记录列表适配器
- * 点击每行跳转到 DayDetailActivity 查看当天具体时间
- */
 class HistoryAdapter(
     private val stats: List<DailyStat>
 ) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvDate: TextView = view.findViewById(R.id.tv_hist_date)
-        val tvCount: TextView = view.findViewById(R.id.tv_hist_count)
-        val tvLevel: TextView = view.findViewById(R.id.tv_hist_level)
-    }
+    class ViewHolder(val binding: ItemHistoryBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_history, parent, false)
-        return ViewHolder(view)
+        val binding = ItemHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val stat = stats[position]
-        holder.tvDate.text = stat.dateStr
-        holder.tvCount.text = "${stat.count} 根"
+        holder.binding.tvHistDate.text = stat.dateStr
+        holder.binding.tvHistCount.text = holder.itemView.context.getString(R.string.count_cigarettes, stat.count)
 
-        val (level, color) = when {
-            stat.count == 0 -> "无烟日 🎉" to 0xFF4CAF50.toInt()
-            stat.count <= 5 -> "轻度 🟢" to 0xFF66BB6A.toInt()
-            stat.count <= 10 -> "中度 🟡" to 0xFFFFC107.toInt()
-            stat.count <= 20 -> "重度 🟠" to 0xFFFF9800.toInt()
-            else -> "严重 🔴" to 0xFFF44336.toInt()
+        val (level, colorRes) = when {
+            stat.count == 0 -> R.string.level_none to R.color.green_good
+            stat.count <= 5 -> R.string.level_light to R.color.green_light
+            stat.count <= 10 -> R.string.level_moderate to R.color.yellow_warn
+            stat.count <= 20 -> R.string.level_heavy to R.color.orange_alert
+            else -> R.string.level_severe to R.color.red_danger
         }
-        holder.tvLevel.text = level
-        holder.tvLevel.setTextColor(color)
+        holder.binding.tvHistLevel.text = holder.itemView.context.getString(level)
+        holder.binding.tvHistLevel.setTextColor(ContextCompat.getColor(holder.itemView.context, colorRes))
 
-        // 点击跳转到当天详情页
         holder.itemView.setOnClickListener { view ->
             val intent = Intent(view.context, DayDetailActivity::class.java).apply {
                 putExtra(DayDetailActivity.EXTRA_DATE, stat.dateStr)

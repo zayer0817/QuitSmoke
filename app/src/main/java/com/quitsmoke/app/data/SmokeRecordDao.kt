@@ -65,6 +65,10 @@ interface SmokeRecordDao {
     @Query("SELECT COUNT(*) FROM smoke_records")
     suspend fun getTotalCount(): Int
 
+    /** 获取最早记录日期，用于确定统计观察期起点 */
+    @Query("SELECT dateStr FROM smoke_records ORDER BY dateStr ASC LIMIT 1")
+    suspend fun getFirstRecordDate(): String?
+
     /** 获取所有记录用于导出 */
     @Query("SELECT * FROM smoke_records ORDER BY timestamp ASC")
     suspend fun getAllRecords(): List<SmokeRecord>

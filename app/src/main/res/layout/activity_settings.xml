@@ -19,7 +19,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:gravity="center"
-            android:text="←"
+            android:text="@string/btn_back"
             android:textColor="@color/text_primary"
             android:textSize="22sp"
             android:clickable="true"
@@ -28,7 +28,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="设置"
+            android:text="@string/title_settings"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -49,7 +49,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="功能"
+                android:text="@string/section_function"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp" />
@@ -78,7 +78,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="📋 历史记录"
+                        android:text="@string/menu_history"
                         android:textColor="@color/text_primary"
                         android:textSize="16sp" />
 
@@ -96,7 +96,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="目标"
+                android:text="@string/section_goal"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp" />
@@ -112,7 +112,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="每日上限"
+                    android:text="@string/label_daily_target"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -121,7 +121,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="目标：10 根/天"
+                    android:text="@string/loading"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
 
@@ -140,7 +140,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="－ 减少"
+                        android:text="@string/btn_target_minus"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:layout_marginEnd="8dp" />
@@ -154,7 +154,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="＋ 增加"
+                        android:text="@string/btn_target_plus"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:layout_marginStart="8dp" />
@@ -165,7 +165,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="外观"
+                android:text="@string/section_appearance"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp" />
@@ -182,7 +182,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="主题模式"
+                    android:text="@string/label_theme_mode"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -191,7 +191,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="跟随系统"
+                    android:text="@string/loading"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
 
@@ -210,7 +210,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="跟随系统"
+                        android:text="@string/theme_system"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:layout_marginEnd="4dp" />
@@ -224,7 +224,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="☀️ 浅色"
+                        android:text="@string/theme_light"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:layout_marginStart="4dp"
@@ -239,7 +239,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="🌙 深色"
+                        android:text="@string/theme_dark"
                         android:textColor="@color/text_primary"
                         android:textSize="13sp"
                         android:layout_marginStart="4dp" />
@@ -250,7 +250,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="数据管理"
+                android:text="@string/section_data"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp" />
@@ -266,7 +266,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="导出与导入"
+                    android:text="@string/label_export_import"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -274,7 +274,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="导出数据到CSV文件或从CSV文件导入恢复"
+                    android:text="@string/label_export_import_desc"
                     android:textColor="@color/text_hint"
                     android:textSize="13sp" />
 
@@ -283,7 +283,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="当前记录：0 条"
+                    android:text="@string/loading"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
 
@@ -303,7 +303,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="📤 导出数据"
+                        android:text="@string/btn_export"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:layout_marginEnd="8dp" />
@@ -318,7 +318,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="📥 导入数据"
+                        android:text="@string/btn_import"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         android:layout_marginStart="8dp" />
@@ -339,7 +339,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="关于"
+                android:text="@string/section_about"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp" />
@@ -355,7 +355,7 @@
                     android:id="@+id/tv_app_version"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="抽了吗"
+                    android:text="@string/loading"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -364,7 +364,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="每一次点击，都是对自己的觉察。\n你比你想象的更强大。"
+                    android:text="@string/about_quote"
                     android:textColor="@color/text_hint"
                     android:textSize="13sp"
                     android:lineSpacingExtra="4dp" />

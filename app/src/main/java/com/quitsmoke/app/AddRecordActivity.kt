@@ -3,69 +3,52 @@ package com.quitsmoke.app
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.quitsmoke.app.data.SmokeRecord
 import com.quitsmoke.app.data.SmokeRepository
+import com.quitsmoke.app.databinding.ActivityAddRecordBinding
 import com.quitsmoke.app.widget.SmokeWidgetProvider
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-/**
- * 手动添加抽烟记录页面
- * 用户可以自定义日期和具体时间
- */
 class AddRecordActivity : BaseActivity() {
 
+    private lateinit var binding: ActivityAddRecordBinding
     private lateinit var repo: SmokeRepository
-    private lateinit var tvSelectedDate: TextView
-    private lateinit var tvSelectedTime: TextView
-    private lateinit var tvSelectedReason: TextView
-    private lateinit var tvConfirm: TextView
 
     private val calendar = Calendar.getInstance()
     private var selectedReason: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        ThemeHelper.init(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_record)
+        binding = ActivityAddRecordBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         repo = SmokeRepository.getInstance(this)
 
-        tvSelectedDate = findViewById(R.id.tv_selected_date)
-        tvSelectedTime = findViewById(R.id.tv_selected_time)
-        tvSelectedReason = findViewById(R.id.tv_selected_reason)
-        tvConfirm = findViewById(R.id.btn_confirm_add)
-
-        // 默认显示当前日期时间
         updateDateDisplay()
         updateTimeDisplay()
 
-        // 返回按钮
-        findViewById<TextView>(R.id.btn_back_add).setOnClickListener {
+        binding.btnBackAdd.setOnClickListener {
             finish()
         }
 
-        // 选择日期
-        findViewById<TextView>(R.id.btn_pick_date).setOnClickListener {
+        binding.btnPickDate.setOnClickListener {
             showDatePicker()
         }
 
-        // 选择时间
-        findViewById<TextView>(R.id.btn_pick_time).setOnClickListener {
+        binding.btnPickTime.setOnClickListener {
             showTimePicker()
         }
 
-        findViewById<TextView>(R.id.btn_pick_reason).setOnClickListener {
+        binding.btnPickReason.setOnClickListener {
             showReasonPicker()
         }
 
-        // 确认添加
-        tvConfirm.setOnClickListener {
+        binding.btnConfirmAdd.setOnClickListener {
             saveRecord()
         }
     }
@@ -86,16 +69,16 @@ class AddRecordActivity : BaseActivity() {
     }
 
     private fun showReasonPicker() {
-        val reasons = arrayOf("饭后", "压力", "社交", "无聊", "习惯", "其他")
+        val reasons = resources.getStringArray(R.array.trigger_reasons)
         AlertDialog.Builder(this)
-            .setTitle("选择触发原因")
+            .setTitle(getString(R.string.select_trigger_reason))
             .setItems(reasons) { _, which ->
                 selectedReason = reasons[which]
-                tvSelectedReason.text = selectedReason
+                binding.tvSelectedReason.text = selectedReason
             }
-            .setNegativeButton("清除") { _, _ ->
+            .setNegativeButton(getString(R.string.btn_clear)) { _, _ ->
                 selectedReason = ""
-                tvSelectedReason.text = "未选择"
+                binding.tvSelectedReason.text = getString(R.string.reason_not_selected)
             }
             .show()
     }
@@ -111,18 +94,18 @@ class AddRecordActivity : BaseActivity() {
             },
             calendar.get(Calendar.HOUR_OF_DAY),
             calendar.get(Calendar.MINUTE),
-            true  // 24小时制
+            true
         ).show()
     }
 
     private fun updateDateDisplay() {
         val sdf = SimpleDateFormat("yyyy-MM-dd (EEE)", Locale.CHINESE)
-        tvSelectedDate.text = sdf.format(calendar.time)
+        binding.tvSelectedDate.text = sdf.format(calendar.time)
     }
 
     private fun updateTimeDisplay() {
         val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-        tvSelectedTime.text = sdf.format(calendar.time)
+        binding.tvSelectedTime.text = sdf.format(calendar.time)
     }
 
     private fun saveRecord() {
@@ -143,7 +126,7 @@ class AddRecordActivity : BaseActivity() {
             SmokeWidgetProvider.notifyWidgetUpdate(this@AddRecordActivity)
             Toast.makeText(
                 this@AddRecordActivity,
-                "已添加：$dateStr ${tvSelectedTime.text}",
+                getString(R.string.toast_added, dateStr, binding.tvSelectedTime.text),
                 Toast.LENGTH_SHORT
             ).show()
             finish()

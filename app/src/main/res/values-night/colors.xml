@@ -19,4 +19,6 @@
     <color name="status_bar">#0D0D1A</color>
     <color name="nav_bar">#0D0D1A</color>
     <color name="bar_highlight_stroke">#80FFFFFF</color>
+    <color name="green_light">#66BB6A</color>
+    <color name="white">#FFFFFF</color>
 </resources>

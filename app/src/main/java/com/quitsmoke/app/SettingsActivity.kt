@@ -3,7 +3,6 @@ package com.quitsmoke.app
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -11,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.quitsmoke.app.data.SmokeRecord
 import com.quitsmoke.app.data.SmokeRepository
+import com.quitsmoke.app.databinding.ActivitySettingsBinding
 import com.quitsmoke.app.widget.SmokeWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,32 +22,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * 设置页面
- * - 主题切换（浅色/深色/跟随系统）
- * - 数据导出/导入
- */
 class SettingsActivity : BaseActivity() {
 
     private lateinit var repo: SmokeRepository
-
-    // 视图
-    private lateinit var tvThemeMode: TextView
-    private lateinit var tvExportResult: TextView
-    private lateinit var tvAppVersion: TextView
-    private lateinit var tvDailyTarget: TextView
-    private lateinit var tvTotalRecords: TextView
-
-    // 主题按钮
-    private lateinit var btnThemeSystem: TextView
-    private lateinit var btnThemeLight: TextView
-    private lateinit var btnThemeDark: TextView
-    private lateinit var btnTargetMinus: TextView
-    private lateinit var btnTargetPlus: TextView
-
-    // 导出导入按钮
-    private lateinit var btnExport: TextView
-    private lateinit var btnImport: TextView
+    private lateinit var binding: ActivitySettingsBinding
 
     private val exportDocumentLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("text/csv")
@@ -66,112 +44,86 @@ class SettingsActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        ThemeHelper.init(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         repo = SmokeRepository.getInstance(this)
-        initViews()
+        binding.tvAppVersion.text = getString(R.string.app_version_format, BuildConfig.VERSION_NAME)
         setupListeners()
-        updateThemeUI()
-        updateGoalUI()
-        loadDataSummary()
-    }
-
-    private fun initViews() {
-        tvThemeMode = findViewById(R.id.tv_theme_mode)
-        tvExportResult = findViewById(R.id.tv_export_result)
-        tvAppVersion = findViewById(R.id.tv_app_version)
-        tvDailyTarget = findViewById(R.id.tv_daily_target)
-        tvTotalRecords = findViewById(R.id.tv_total_records)
-        btnThemeSystem = findViewById(R.id.btn_theme_system)
-        btnThemeLight = findViewById(R.id.btn_theme_light)
-        btnThemeDark = findViewById(R.id.btn_theme_dark)
-        btnTargetMinus = findViewById(R.id.btn_target_minus)
-        btnTargetPlus = findViewById(R.id.btn_target_plus)
-        btnExport = findViewById(R.id.btn_export)
-        btnImport = findViewById(R.id.btn_import)
-
-        tvAppVersion.text = "抽了吗 v${BuildConfig.VERSION_NAME}"
+        lifecycleScope.launch {
+            updateThemeUI()
+            updateGoalUI()
+            loadDataSummary()
+        }
     }
 
     private fun setupListeners() {
-        // 返回按钮
-        findViewById<TextView>(R.id.btn_back_settings).setOnClickListener {
+        binding.btnBackSettings.setOnClickListener {
             finish()
         }
 
-        // 历史记录跳转
-        findViewById<LinearLayout>(R.id.item_history).setOnClickListener {
+        binding.itemHistory.setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
 
-        // 主题切换
-        btnThemeSystem.setOnClickListener { switchTheme(ThemeHelper.MODE_SYSTEM) }
-        btnThemeLight.setOnClickListener { switchTheme(ThemeHelper.MODE_LIGHT) }
-        btnThemeDark.setOnClickListener { switchTheme(ThemeHelper.MODE_DARK) }
+        binding.btnThemeSystem.setOnClickListener { switchTheme(AppPreferences.MODE_SYSTEM) }
+        binding.btnThemeLight.setOnClickListener { switchTheme(AppPreferences.MODE_LIGHT) }
+        binding.btnThemeDark.setOnClickListener { switchTheme(AppPreferences.MODE_DARK) }
 
-        btnTargetMinus.setOnClickListener { adjustDailyTarget(-1) }
-        btnTargetPlus.setOnClickListener { adjustDailyTarget(1) }
+        binding.btnTargetMinus.setOnClickListener { adjustDailyTarget(-1) }
+        binding.btnTargetPlus.setOnClickListener { adjustDailyTarget(1) }
 
-        // 数据导出
-        btnExport.setOnClickListener { exportData() }
-
-        // 数据导入
-        btnImport.setOnClickListener { importData() }
+        binding.btnExport.setOnClickListener { exportData() }
+        binding.btnImport.setOnClickListener { importData() }
     }
-
-    // ========== 主题切换 ==========
 
     private fun switchTheme(mode: Int) {
-        ThemeHelper.setThemeMode(this, mode)
-        updateThemeUI()
-        // 主题切换会自动重建Activity
-    }
-
-    private fun updateThemeUI() {
-        val currentMode = ThemeHelper.getThemeMode(this)
-        tvThemeMode.text = "当前：${ThemeHelper.getModeName(currentMode)}"
-
-        // 高亮当前选中的主题按钮
-        val activeBg = R.drawable.btn_smoke_bg
-        val inactiveBg = R.drawable.btn_undo_bg
-
-        btnThemeSystem.setBackgroundResource(if (currentMode == ThemeHelper.MODE_SYSTEM) activeBg else inactiveBg)
-        btnThemeLight.setBackgroundResource(if (currentMode == ThemeHelper.MODE_LIGHT) activeBg else inactiveBg)
-        btnThemeDark.setBackgroundResource(if (currentMode == ThemeHelper.MODE_DARK) activeBg else inactiveBg)
-
-        // 激活时文字用白色
-        val activeTextColor = 0xFFFFFFFF.toInt()
-        val inactiveTextColor = resources.getColor(R.color.text_primary, theme)
-
-        btnThemeSystem.setTextColor(if (currentMode == ThemeHelper.MODE_SYSTEM) activeTextColor else inactiveTextColor)
-        btnThemeLight.setTextColor(if (currentMode == ThemeHelper.MODE_LIGHT) activeTextColor else inactiveTextColor)
-        btnThemeDark.setTextColor(if (currentMode == ThemeHelper.MODE_DARK) activeTextColor else inactiveTextColor)
-    }
-
-    private fun adjustDailyTarget(delta: Int) {
-        val current = GoalPreferences.getDailyTarget(this)
-        GoalPreferences.setDailyTarget(this, current + delta)
-        updateGoalUI()
-        SmokeWidgetProvider.notifyWidgetUpdate(this)
-    }
-
-    private fun updateGoalUI() {
-        val target = GoalPreferences.getDailyTarget(this)
-        tvDailyTarget.text = "目标：$target 根/天"
-    }
-
-    private fun loadDataSummary() {
         lifecycleScope.launch {
-            val total = withContext(Dispatchers.IO) {
-                repo.getTotalCount()
-            }
-            tvTotalRecords.text = "当前记录：$total 条"
+            AppPreferences.setThemeMode(this@SettingsActivity, mode)
+            updateThemeUI()
         }
     }
 
-    // ========== 数据导出 ==========
+    private suspend fun updateThemeUI() {
+        val currentMode = AppPreferences.getThemeMode(this@SettingsActivity)
+        binding.tvThemeMode.text = getString(R.string.current_theme_format, AppPreferences.getModeName(currentMode))
+
+        val activeBg = R.drawable.btn_smoke_bg
+        val inactiveBg = R.drawable.btn_undo_bg
+
+        binding.btnThemeSystem.setBackgroundResource(if (currentMode == AppPreferences.MODE_SYSTEM) activeBg else inactiveBg)
+        binding.btnThemeLight.setBackgroundResource(if (currentMode == AppPreferences.MODE_LIGHT) activeBg else inactiveBg)
+        binding.btnThemeDark.setBackgroundResource(if (currentMode == AppPreferences.MODE_DARK) activeBg else inactiveBg)
+
+        val activeTextColor = getColor(R.color.white)
+        val inactiveTextColor = resources.getColor(R.color.text_primary, theme)
+
+        binding.btnThemeSystem.setTextColor(if (currentMode == AppPreferences.MODE_SYSTEM) activeTextColor else inactiveTextColor)
+        binding.btnThemeLight.setTextColor(if (currentMode == AppPreferences.MODE_LIGHT) activeTextColor else inactiveTextColor)
+        binding.btnThemeDark.setTextColor(if (currentMode == AppPreferences.MODE_DARK) activeTextColor else inactiveTextColor)
+    }
+
+    private fun adjustDailyTarget(delta: Int) {
+        lifecycleScope.launch {
+            val current = AppPreferences.getDailyTarget(this@SettingsActivity)
+            AppPreferences.setDailyTarget(this@SettingsActivity, current + delta)
+            updateGoalUI()
+            SmokeWidgetProvider.notifyWidgetUpdate(this@SettingsActivity)
+        }
+    }
+
+    private suspend fun updateGoalUI() {
+        val target = AppPreferences.getDailyTarget(this@SettingsActivity)
+        binding.tvDailyTarget.text = getString(R.string.target_format, target)
+    }
+
+    private suspend fun loadDataSummary() {
+        val total = withContext(Dispatchers.IO) {
+            repo.getTotalCount()
+        }
+        binding.tvTotalRecords.text = getString(R.string.total_records_format, total)
+    }
 
     private fun exportData() {
         val dateFormat = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
@@ -179,18 +131,12 @@ class SettingsActivity : BaseActivity() {
         exportDocumentLauncher.launch(fileName)
     }
 
-    // ========== 数据导入 ==========
-
     private fun importData() {
         importDocumentLauncher.launch(
             arrayOf("text/csv", "text/comma-separated-values", "application/csv", "text/*")
         )
     }
 
-    /**
-     * 执行导出操作
-     * CSV格式：id,timestamp,dateStr,hourOfDay,note
-     */
     private fun performExport(uri: Uri) {
         lifecycleScope.launch {
             try {
@@ -201,7 +147,6 @@ class SettingsActivity : BaseActivity() {
                 withContext(Dispatchers.IO) {
                     contentResolver.openOutputStream(uri)?.use { outputStream ->
                         val writer = OutputStreamWriter(outputStream, Charsets.UTF_8)
-                        // 写入BOM头，让Excel正确识别UTF-8
                         writer.write("\uFEFF")
                         writer.write(buildCsvLine(listOf("id", "timestamp", "dateStr", "hourOfDay", "note")))
                         for (record in records) {
@@ -221,16 +166,13 @@ class SettingsActivity : BaseActivity() {
                     }
                 }
 
-                showDataResult("导出成功！共 ${records.size} 条记录")
+                showDataResult(getString(R.string.export_success, records.size))
             } catch (e: Exception) {
-                showDataResult("导出失败：${e.message}")
+                showDataResult(getString(R.string.export_failed, e.message))
             }
         }
     }
 
-    /**
-     * 执行导入操作
-     */
     private fun performImport(uri: Uri) {
         lifecycleScope.launch {
             try {
@@ -246,21 +188,17 @@ class SettingsActivity : BaseActivity() {
                 }
                 showImportConfirm(preview)
             } catch (e: Exception) {
-                showDataResult("导入失败：${e.message}")
+                showDataResult(getString(R.string.import_failed, e.message))
             }
         }
     }
 
     private fun showImportConfirm(preview: ImportPreview) {
         AlertDialog.Builder(this)
-            .setTitle("确认导入")
-            .setMessage(
-                "将新增 ${preview.insertableCount} 条记录\n" +
-                    "跳过重复 ${preview.duplicateCount} 条\n" +
-                    "无效记录 ${preview.invalidCount} 条"
-            )
-            .setNegativeButton("取消", null)
-            .setPositiveButton("导入") { _, _ ->
+            .setTitle(getString(R.string.confirm_import))
+            .setMessage(getString(R.string.import_preview_format, preview.insertableCount, preview.duplicateCount, preview.invalidCount))
+            .setNegativeButton(getString(R.string.btn_cancel), null)
+            .setPositiveButton(getString(R.string.btn_import_confirm)) { _, _ ->
                 confirmImport(preview.records)
             }
             .show()
@@ -276,16 +214,13 @@ class SettingsActivity : BaseActivity() {
                     SmokeWidgetProvider.notifyWidgetUpdate(this@SettingsActivity)
                 }
                 loadDataSummary()
-                showDataResult("导入完成：新增 $insertedCount 条")
+                showDataResult(getString(R.string.import_complete, insertedCount))
             } catch (e: Exception) {
-                showDataResult("导入失败：${e.message}")
+                showDataResult(getString(R.string.import_failed, e.message))
             }
         }
     }
 
-    /**
-     * 读取CSV记录，支持引号、逗号以及引号内换行。
-     */
     private fun readImportedRecords(uri: Uri): ImportReadResult {
         val records = mutableListOf<SmokeRecord>()
         var invalidCount = 0
@@ -342,9 +277,6 @@ class SettingsActivity : BaseActivity() {
         return rows
     }
 
-    /**
-     * 解析CSV行（处理引号内的逗号和转义双引号）
-     */
     private fun parseCsvLine(line: String): List<String> {
         val result = mutableListOf<String>()
         var current = StringBuilder()
@@ -429,8 +361,8 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun showDataResult(message: String) {
-        tvExportResult.text = message
-        tvExportResult.visibility = TextView.VISIBLE
+        binding.tvExportResult.text = message
+        binding.tvExportResult.visibility = TextView.VISIBLE
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 

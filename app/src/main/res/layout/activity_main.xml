@@ -27,7 +27,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="抽了吗"
+                android:text="@string/title_main"
                 android:textColor="@color/text_primary"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -41,7 +41,7 @@
                 android:paddingEnd="12dp"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
-                android:text="＋ 手动添加"
+                android:text="@string/btn_add_manual"
                 android:textColor="@color/text_primary"
                 android:textSize="13sp"
                 android:clickable="true"
@@ -60,7 +60,7 @@
                 android:paddingEnd="12dp"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
-                android:text="设置"
+                android:text="@string/btn_settings"
                 android:textColor="@color/text_primary"
                 android:textSize="13sp"
                 android:clickable="true"
@@ -80,7 +80,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="今日已抽"
+                android:text="@string/today_smoked"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
 
@@ -100,7 +100,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="今天还没有抽烟，坚持住！"
+                android:text="@string/today_tip_no_smoke"
                 android:textColor="@color/green_good"
                 android:textSize="14sp" />
 
@@ -109,7 +109,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="目标 0/10"
+                android:text="@string/loading"
                 android:textColor="@color/text_hint"
                 android:textSize="13sp" />
 
@@ -132,7 +132,7 @@
                     android:gravity="center"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
-                    android:text="↩ 撤销"
+                    android:text="@string/btn_undo"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp" />
 
@@ -151,7 +151,7 @@
                     android:gravity="center"
                     android:paddingStart="24dp"
                     android:paddingEnd="24dp"
-                    android:text="🚬 抽一根"
+                    android:text="@string/btn_smoke"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -170,7 +170,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🎯 目标追踪"
+                android:text="@string/section_goal_tracking"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -192,7 +192,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="连续达标"
+                        android:text="@string/label_consecutive_target"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -201,7 +201,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="0 天"
+                        android:text="@string/loading"
                         android:textColor="@color/green_good"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -218,7 +218,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="连续无烟"
+                        android:text="@string/label_consecutive_no_smoke"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -227,7 +227,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="0 天"
+                        android:text="@string/loading"
                         android:textColor="@color/teal_calm"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -239,7 +239,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="本月统计加载中..."
+                android:text="@string/month_loading"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
                 android:lineSpacingExtra="3dp" />
@@ -257,7 +257,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📊 本周概览"
+                android:text="@string/section_week_overview"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -280,7 +280,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="本周总计"
+                        android:text="@string/label_week_total"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -289,7 +289,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="0 根"
+                        android:text="@string/loading"
                         android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -307,7 +307,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="日均"
+                        android:text="@string/label_daily_avg"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -316,7 +316,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="0 根/天"
+                        android:text="@string/loading"
                         android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -334,7 +334,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="趋势"
+                        android:text="@string/label_trend"
                         android:textColor="@color/text_secondary"
                         android:textSize="12sp" />
 
@@ -343,7 +343,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="→ 持平"
+                        android:text="@string/trend_flat"
                         android:textColor="@color/yellow_warn"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -363,7 +363,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📈 最近7天趋势"
+                android:text="@string/section_7day_trend"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -391,7 +391,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="💡 戒烟建议"
+                android:text="@string/section_advice"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -401,7 +401,7 @@
                 android:id="@+id/tv_advice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="加载中..."
+                android:text="@string/loading"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:lineSpacingExtra="4dp" />
@@ -419,7 +419,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🫁 你知道吗"
+                android:text="@string/section_motivation"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -429,7 +429,7 @@
                 android:id="@+id/tv_motivation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="加载中..."
+                android:text="@string/loading"
                 android:textColor="@color/teal_calm"
                 android:textSize="14sp"
                 android:lineSpacingExtra="4dp"

@@ -9,8 +9,8 @@
         <item name="colorSecondaryVariant">#66BB6A</item>
         <item name="colorOnSecondary">#FFFFFF</item>
         <item name="android:windowBackground">@color/bg_main</item>
-        <!-- 沉浸式状态栏：透明背景 + 深色图标 -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- 沉浸式状态栏：使用页面背景色，避免浅色模式显示成系统白色 -->
+        <item name="android:statusBarColor">@color/status_bar</item>
         <item name="android:navigationBarColor">@color/nav_bar</item>
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
