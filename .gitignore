@@ -43,3 +43,6 @@ Thumbs.db
 
 # WorkBuddy workspace data
 .workbuddy/
+
+# Kilo config
+.kilo/

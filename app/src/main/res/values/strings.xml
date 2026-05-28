@@ -12,7 +12,7 @@
 
     <!-- MainActivity -->
     <string name="title_main">抽了吗</string>
-    <string name="btn_add_manual">＋ 手动添加</string>
+    <string name="btn_add_manual">添加</string>
     <string name="btn_settings">设置</string>
     <string name="today_smoked">今日已抽</string>
     <string name="today_tip_no_smoke">今天还没有抽烟，坚持住！</string>
@@ -30,16 +30,14 @@
     <string name="label_consecutive_no_smoke">连续无烟</string>
     <string name="month_summary_format">本月 %1$d 根，日均 %2$s 根/天\n%3$d 天中达标 %4$d 天，无烟 %5$d 天</string>
     <string name="month_loading">本月统计加载中…</string>
-    <string name="section_week_overview">📊 本周概览</string>
     <string name="label_week_total">本周总计</string>
     <string name="label_daily_avg">日均</string>
     <string name="label_trend">趋势</string>
     <string name="trend_flat">→ 持平</string>
     <string name="trend_down">↓ 比上周减少了 %d 根</string>
     <string name="trend_up">↑ 比上周增加了 %d 根</string>
-    <string name="section_7day_trend">📈 最近7天趋势</string>
-    <string name="section_advice">💡 戒烟建议</string>
-    <string name="section_motivation">🫁 你知道吗</string>
+    <string name="section_7day_trend">📈 近期趋势</string>
+    <string name="section_advice">💡 今日提醒</string>
 
     <!-- 时段分析 -->
     <string name="hour_dawn">凌晨 %d:00</string>
@@ -49,28 +47,13 @@
     <string name="hour_afternoon">下午 %d:00</string>
     <string name="hour_evening">傍晚 %d:00</string>
     <string name="hour_night">晚上 %d:00</string>
-    <string name="advice_peak_hour">📊 你的高峰时段是 %s，这个时段烟瘾最强。\n   建议：在此时段准备替代品（口香糖、喝水等）\n\n</string>
-    <string name="advice_no_smoke_week">🎉 整整一周没有抽烟！你太厉害了！</string>
-    <string name="advice_trend_down">📉 本周比上周减少了 %s，继续保持！\n\n💡 建议：设定阶段性目标，逐步减少每日上限。</string>
-    <string name="advice_trend_up">⚠️ 本周比上周有所增加，需要警惕！\n\n💡 建议：\n  • 找出触发抽烟的场景，尽量避免\n  • 每次想抽烟时先等5分钟\n  • 增加运动量，转移注意力</string>
-    <string name="advice_heavy">🚨 平均每天超过10根，属于重度吸烟。\n\n💡 强烈建议：\n  • 咨询医生，考虑使用尼古丁替代疗法\n  • 设定每日上限并严格遵守\n  • 寻找家人朋友的支持</string>
-    <string name="advice_normal">💪 当前状态尚可，继续控制每日数量。\n\n💡 建议：尝试每天比前一天少抽1根。</string>
-    <string name="reduce_pct">%d%%</string>
-    <string name="reduce_some">一些</string>
-
-    <!-- 激励语 -->
-    <string-array name="motivations">
-        <item>你每少抽一根烟，肺部的纤毛就开始恢复工作。</item>
-        <item>戒烟20分钟：心率和血压开始恢复正常。</item>
-        <item>戒烟12小时：血液中一氧化碳水平恢复正常。</item>
-        <item>戒烟2-12周：血液循环改善，肺功能增强。</item>
-        <item>戒烟1-9个月：咳嗽和气短减轻。</item>
-        <item>戒烟1年：心脏病风险降低一半。</item>
-        <item>戒烟5年：中风风险降至非吸烟者水平。</item>
-        <item>每少抽一根烟，平均延长11分钟寿命。</item>
-        <item>你的家人因为你的坚持而更安心。</item>
-        <item>坚持就是胜利，每一根不抽都是进步！</item>
-    </string-array>
+    <string name="reminder_no_smoke_today">今天还没记录，先稳住这一口。</string>
+    <string name="reminder_over_target">已经超过目标了，下一根先等等 5 分钟。</string>
+    <string name="reminder_trend_down">比前一段少了，挺好，别急着奖励自己一根。</string>
+    <string name="reminder_trend_up">最近有点往上走，下一根先往后推一会儿。</string>
+    <string name="reminder_heavy">最近量偏高，先把今天剩下的时间稳住。</string>
+    <string name="reminder_peak_hour">最近 %s 更容易抽，提前准备点替代动作。</string>
+    <string name="reminder_normal">今天还在可控范围内，先把下一根往后推一会儿。</string>
 
     <!-- SettingsActivity -->
     <string name="title_settings">设置</string>

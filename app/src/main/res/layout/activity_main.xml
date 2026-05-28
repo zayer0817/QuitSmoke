@@ -29,18 +29,15 @@
                 android:layout_weight="1"
                 android:text="@string/title_main"
                 android:textColor="@color/text_primary"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/btn_add_manual"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="56dp"
+                android:layout_height="32dp"
                 android:background="@drawable/btn_undo_bg"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
+                android:gravity="center"
                 android:text="@string/btn_add_manual"
                 android:textColor="@color/text_primary"
                 android:textSize="13sp"
@@ -53,13 +50,10 @@
 
             <TextView
                 android:id="@+id/btn_settings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="56dp"
+                android:layout_height="32dp"
                 android:background="@drawable/btn_undo_bg"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
+                android:gravity="center"
                 android:text="@string/btn_settings"
                 android:textColor="@color/text_primary"
                 android:textSize="13sp"
@@ -74,7 +68,7 @@
             android:background="@drawable/card_background"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="24dp"
+            android:padding="20dp"
             android:layout_marginBottom="12dp">
 
             <TextView
@@ -82,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/today_smoked"
                 android:textColor="@color/text_secondary"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/tv_today_count"
@@ -91,7 +85,7 @@
                 android:layout_marginTop="8dp"
                 android:text="0"
                 android:textColor="@color/text_primary"
-                android:textSize="64sp"
+                android:textSize="60sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-condensed" />
 
@@ -102,7 +96,7 @@
                 android:layout_marginTop="4dp"
                 android:text="@string/today_tip_no_smoke"
                 android:textColor="@color/green_good"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/tv_today_target"
@@ -111,7 +105,7 @@
                 android:layout_marginTop="6dp"
                 android:text="@string/loading"
                 android:textColor="@color/text_hint"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
 
             <!-- 操作按钮行 -->
             <LinearLayout
@@ -124,14 +118,12 @@
                 <!-- 撤销按钮 -->
                 <TextView
                     android:id="@+id/btn_undo"
-                    android:layout_width="wrap_content"
+                    android:layout_width="104dp"
                     android:layout_height="40dp"
                     android:background="@drawable/btn_undo_bg"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
                     android:text="@string/btn_undo"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp" />
@@ -143,19 +135,127 @@
                 <!-- 抽一根按钮 -->
                 <TextView
                     android:id="@+id/btn_smoke_main"
-                    android:layout_width="wrap_content"
+                    android:layout_width="132dp"
                     android:layout_height="40dp"
                     android:background="@drawable/btn_smoke_bg"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:paddingStart="24dp"
-                    android:paddingEnd="24dp"
                     android:text="@string/btn_smoke"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp"
                     android:textStyle="bold" />
             </LinearLayout>
+        </LinearLayout>
+
+        <!-- 7天趋势图卡片 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_background"
+            android:orientation="vertical"
+            android:padding="14dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/section_7day_trend"
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_week_total"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_week_total"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/loading"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_daily_avg"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_week_avg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/loading"
+                        android:textColor="@color/text_primary"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.3"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_trend"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_trend"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/trend_flat"
+                        android:textColor="@color/yellow_warn"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 柱状图区域 -->
+            <LinearLayout
+                android:id="@+id/layout_bars"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:orientation="horizontal"
+                android:minHeight="144dp" />
         </LinearLayout>
 
         <!-- 目标追踪卡片 -->
@@ -172,9 +272,9 @@
                 android:layout_height="wrap_content"
                 android:text="@string/section_goal_tracking"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="10dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -187,7 +287,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="8dp">
+                    android:padding="6dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -200,10 +300,10 @@
                         android:id="@+id/tv_goal_streak"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="3dp"
                         android:text="@string/loading"
                         android:textColor="@color/green_good"
-                        android:textSize="18sp"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -213,7 +313,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="8dp">
+                    android:padding="6dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -226,10 +326,10 @@
                         android:id="@+id/tv_no_smoke_streak"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="3dp"
                         android:text="@string/loading"
                         android:textColor="@color/teal_calm"
-                        android:textSize="18sp"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
@@ -241,142 +341,8 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/month_loading"
                 android:textColor="@color/text_secondary"
-                android:textSize="13sp"
+                android:textSize="12sp"
                 android:lineSpacingExtra="3dp" />
-        </LinearLayout>
-
-        <!-- 本周概览卡片 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/card_background"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/section_week_overview"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <!-- 本周总计 -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_week_total"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tv_week_total"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/loading"
-                        android:textColor="@color/text_primary"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <!-- 日均 -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_daily_avg"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tv_week_avg"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/loading"
-                        android:textColor="@color/text_primary"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <!-- 趋势 -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_trend"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:id="@+id/tv_trend"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/trend_flat"
-                        android:textColor="@color/yellow_warn"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- 7天趋势图卡片 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/card_background"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/section_7day_trend"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <!-- 柱状图区域 -->
-            <LinearLayout
-                android:id="@+id/layout_bars"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="bottom"
-                android:orientation="horizontal"
-                android:minHeight="160dp" />
         </LinearLayout>
 
         <!-- 戒烟建议卡片 -->
@@ -393,9 +359,9 @@
                 android:layout_height="wrap_content"
                 android:text="@string/section_advice"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="6dp" />
 
             <TextView
                 android:id="@+id/tv_advice"
@@ -403,37 +369,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/loading"
                 android:textColor="@color/text_secondary"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:lineSpacingExtra="4dp" />
-        </LinearLayout>
-
-        <!-- 健康知识激励卡片 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/card_background"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="24dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/section_motivation"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/tv_motivation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/loading"
-                android:textColor="@color/teal_calm"
-                android:textSize="14sp"
-                android:lineSpacingExtra="4dp"
-                android:fontFamily="serif" />
         </LinearLayout>
 
     </LinearLayout>

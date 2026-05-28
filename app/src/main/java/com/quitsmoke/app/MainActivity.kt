@@ -19,6 +19,8 @@ import java.util.*
 
 class MainActivity : BaseActivity() {
 
+    override val useTransparentStatusBar: Boolean = true
+
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
 
@@ -37,8 +39,7 @@ class MainActivity : BaseActivity() {
                     state.weekReport?.let { updateWeekSection(it) }
                     state.weekReport?.let { updateBars(it.dailyStats) }
                     if (state.weekReport != null) {
-                        updateAdvice(state.todayCount, state.weekReport, state.hourlyStats)
-                        updateMotivation(state.weekReport)
+                        updateAdvice(state.todayCount, state.dailyTarget, state.weekReport, state.hourlyStats)
                     }
                 }
             }
@@ -179,56 +180,33 @@ class MainActivity : BaseActivity() {
     }
 
     private fun updateAdvice(
-        @Suppress("UNUSED_PARAMETER") todayCount: Int,
-        @Suppress("UNUSED_PARAMETER") weekReport: WeekReport,
+        todayCount: Int,
+        dailyTarget: Int,
+        weekReport: WeekReport,
         hourly: List<com.quitsmoke.app.data.HourlyStat>
     ) {
-        val sb = StringBuilder()
-
-        if (hourly.isNotEmpty()) {
-            val peakHour = hourly.maxByOrNull { it.count }
-            if (peakHour != null && peakHour.count > 0) {
-                val timeRange = when (peakHour.hourOfDay) {
-                    in 0..5 -> getString(R.string.hour_dawn, peakHour.hourOfDay)
-                    in 6..8 -> getString(R.string.hour_morning, peakHour.hourOfDay)
-                    in 9..11 -> getString(R.string.hour_forenoon, peakHour.hourOfDay)
-                    in 12..13 -> getString(R.string.hour_noon, peakHour.hourOfDay)
-                    in 14..17 -> getString(R.string.hour_afternoon, peakHour.hourOfDay)
-                    in 18..20 -> getString(R.string.hour_evening, peakHour.hourOfDay)
-                    else -> getString(R.string.hour_night, peakHour.hourOfDay)
-                }
-                sb.append(getString(R.string.advice_peak_hour, timeRange))
+        val peakHour = hourly.maxByOrNull { it.count }?.takeIf { it.count > 0 }
+        val peakHint = peakHour?.let {
+            val timeRange = when (it.hourOfDay) {
+                in 0..5 -> getString(R.string.hour_dawn, it.hourOfDay)
+                in 6..8 -> getString(R.string.hour_morning, it.hourOfDay)
+                in 9..11 -> getString(R.string.hour_forenoon, it.hourOfDay)
+                in 12..13 -> getString(R.string.hour_noon, it.hourOfDay)
+                in 14..17 -> getString(R.string.hour_afternoon, it.hourOfDay)
+                in 18..20 -> getString(R.string.hour_evening, it.hourOfDay)
+                else -> getString(R.string.hour_night, it.hourOfDay)
             }
+            getString(R.string.reminder_peak_hour, timeRange)
         }
 
-        when {
-            weekReport.totalWeek == 0 -> {
-                sb.append(getString(R.string.advice_no_smoke_week))
-            }
-            weekReport.trend == -1 -> {
-                val reducePct = if (weekReport.prevWeekTotal > 0) {
-                    val pct = (weekReport.prevWeekTotal - weekReport.totalWeek) * 100 / weekReport.prevWeekTotal
-                    getString(R.string.reduce_pct, pct)
-                } else getString(R.string.reduce_some)
-                sb.append(getString(R.string.advice_trend_down, reducePct))
-            }
-            weekReport.trend == 1 -> {
-                sb.append(getString(R.string.advice_trend_up))
-            }
-            weekReport.avgDaily.toFloat() > 10 -> {
-                sb.append(getString(R.string.advice_heavy))
-            }
-            else -> {
-                sb.append(getString(R.string.advice_normal))
-            }
+        binding.tvAdvice.text = peakHint ?: when {
+            todayCount == 0 -> getString(R.string.reminder_no_smoke_today)
+            todayCount > dailyTarget -> getString(R.string.reminder_over_target)
+            weekReport.trend == -1 -> getString(R.string.reminder_trend_down)
+            weekReport.trend == 1 -> getString(R.string.reminder_trend_up)
+            weekReport.avgDaily.toFloatOrNull()?.let { it >= 10f } == true -> getString(R.string.reminder_heavy)
+            else -> getString(R.string.reminder_normal)
         }
-
-        binding.tvAdvice.text = sb.toString()
-    }
-
-    private fun updateMotivation(@Suppress("UNUSED_PARAMETER") weekReport: WeekReport) {
-        val motivations = resources.getStringArray(R.array.motivations)
-        binding.tvMotivation.text = motivations.random()
     }
 
     private fun notifyWidgetUpdate() {
