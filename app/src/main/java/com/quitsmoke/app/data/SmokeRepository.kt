@@ -35,11 +35,17 @@ class SmokeRepository internal constructor(
         return Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
     }
 
-    suspend fun recordSmoke(): SmokeRecord {
+    suspend fun recordSmoke(offsetMinutes: Int = 0): SmokeRecord {
+        val now = System.currentTimeMillis()
+        val adjustedTimestamp = now + offsetMinutes * 60_000L
+        val calendar = Calendar.getInstance().apply { timeInMillis = adjustedTimestamp }
+        val dateStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
+        val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
+
         val record = SmokeRecord(
-            timestamp = System.currentTimeMillis(),
-            dateStr = getTodayStr(),
-            hourOfDay = getCurrentHour()
+            timestamp = adjustedTimestamp,
+            dateStr = dateStr,
+            hourOfDay = hourOfDay
         )
         val id = dao.insert(record)
         return record.copy(id = id)
@@ -52,6 +58,10 @@ class SmokeRepository internal constructor(
             return true
         }
         return false
+    }
+
+    suspend fun deleteRecord(id: Long) {
+        dao.deleteById(id)
     }
 
     suspend fun getTodayCount(): Int {

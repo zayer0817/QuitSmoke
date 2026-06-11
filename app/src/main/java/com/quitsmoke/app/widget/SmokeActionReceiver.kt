@@ -18,6 +18,13 @@ class SmokeActionReceiver : BroadcastReceiver() {
     companion object {
         const val ACTION_SMOKE = "com.quitsmoke.app.ACTION_SMOKE"
         const val ACTION_UNDO = "com.quitsmoke.app.ACTION_UNDO"
+
+        private const val RAPID_CLICK_THRESHOLD_MS = 3000L
+        private const val INTERVAL_MINUTES = 15
+
+        private var lastClickTime = 0L
+        private var rapidClickCount = 0
+        private var cachedTodayCount = -1
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -31,27 +38,51 @@ class SmokeActionReceiver : BroadcastReceiver() {
     }
 
     private fun handleSmoke(context: Context, pendingResult: PendingResult) {
+        val now = System.currentTimeMillis()
+        val isRapidClick = (now - lastClickTime) < RAPID_CLICK_THRESHOLD_MS
+        lastClickTime = now
+
+        if (isRapidClick) {
+            rapidClickCount++
+        } else {
+            rapidClickCount = 0
+        }
+
+        val offsetMinutes = rapidClickCount * INTERVAL_MINUTES
+        val estimatedCount = if (cachedTodayCount >= 0) cachedTodayCount + 1 + rapidClickCount else -1
+
+        showQuickToast(context, estimatedCount, rapidClickCount)
+
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
                 val repo = SmokeRepository.getInstance(context)
-                repo.recordSmoke()
+                repo.recordSmoke(offsetMinutes)
                 val todayCount = repo.getTodayCount()
+                cachedTodayCount = todayCount
 
                 withContext(Dispatchers.Main) {
-                    val msg = when {
-                        todayCount <= 3 -> context.getString(R.string.toast_recorded_low, todayCount)
-                        todayCount <= 8 -> context.getString(R.string.toast_recorded_mid, todayCount)
-                        todayCount <= 15 -> context.getString(R.string.toast_recorded_high, todayCount)
-                        else -> context.getString(R.string.toast_recorded_severe, todayCount)
-                    }
-                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-
                     SmokeWidgetProvider.notifyWidgetUpdate(context)
                 }
             } finally {
                 pendingResult.finish()
             }
         }
+    }
+
+    private fun showQuickToast(context: Context, estimatedCount: Int, rapidClickCount: Int) {
+        val msg = if (rapidClickCount > 0) {
+            context.getString(R.string.toast_rapid_record, rapidClickCount + 1, INTERVAL_MINUTES)
+        } else if (estimatedCount > 0) {
+            when {
+                estimatedCount <= 3 -> context.getString(R.string.toast_recorded_low, estimatedCount)
+                estimatedCount <= 8 -> context.getString(R.string.toast_recorded_mid, estimatedCount)
+                estimatedCount <= 15 -> context.getString(R.string.toast_recorded_high, estimatedCount)
+                else -> context.getString(R.string.toast_recorded_severe, estimatedCount)
+            }
+        } else {
+            context.getString(R.string.toast_recording)
+        }
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 
     private fun handleUndo(context: Context, pendingResult: PendingResult) {

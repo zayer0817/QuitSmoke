@@ -10,7 +10,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class DayDetailAdapter(
-    private val records: List<SmokeRecord>
+    private val records: MutableList<SmokeRecord>,
+    private val onDelete: (SmokeRecord, Int) -> Unit
 ) : RecyclerView.Adapter<DayDetailAdapter.ViewHolder>() {
 
     private val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
@@ -31,6 +32,10 @@ class DayDetailAdapter(
             holder.binding.tvDetailNote.visibility = View.VISIBLE
         } else {
             holder.binding.tvDetailNote.visibility = View.GONE
+        }
+        holder.binding.root.setOnLongClickListener {
+            onDelete(record, holder.adapterPosition)
+            true
         }
     }
 

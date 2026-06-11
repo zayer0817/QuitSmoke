@@ -104,6 +104,10 @@
     <string name="title_day_detail">记录详情</string>
     <string name="day_detail_empty">🎉 这一天没有抽烟记录</string>
     <string name="detail_index_format">第 %d 根</string>
+    <string name="confirm_delete_title">删除记录</string>
+    <string name="confirm_delete_message">确定删除 %s 的记录吗？</string>
+    <string name="btn_delete">删除</string>
+    <string name="toast_record_deleted">记录已删除</string>
 
     <!-- AddRecordActivity -->
     <string name="title_add_record">手动添加记录</string>
@@ -146,4 +150,6 @@
     <string name="toast_recorded_severe">今天已经 %d 根了！为了健康请停下来</string>
     <string name="toast_undo_success">已撤销，当前 %d 根</string>
     <string name="toast_undo_empty">没有可撤销的记录</string>
+    <string name="toast_rapid_record">连续记录 %1$d 次，间隔 %2$d 分钟</string>
+    <string name="toast_recording">记录中…</string>
 </resources>
