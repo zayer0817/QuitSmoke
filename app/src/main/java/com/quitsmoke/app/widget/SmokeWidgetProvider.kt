@@ -119,10 +119,28 @@ class SmokeWidgetProvider : AppWidgetProvider() {
         )
     }
 
-    private fun buildRemoteViews(context: Context, todayCount: Int, dailyTarget: Int): RemoteViews {
+    private suspend fun buildRemoteViews(context: Context, todayCount: Int, dailyTarget: Int): RemoteViews {
         val views = RemoteViews(context.packageName, R.layout.widget_smoke)
 
         views.setTextViewText(R.id.tv_today_count, "$todayCount")
+
+        // 跟随软件内主题色（从 SharedPreferences 缓存读取，与 DataStore 同步）
+        val themeColor = AppPreferences.getCachedThemeColor(context)
+        val colorInt = android.graphics.Color.parseColor(themeColor)
+
+        // Create rounded bitmap matching button size (ImageView scales via fitXY)
+        val density = context.resources.displayMetrics.density
+        val radius = 18f * density
+        val btnWidth = (90 * density).toInt()
+        val btnHeight = (64 * density).toInt()
+        val bitmap = android.graphics.Bitmap.createBitmap(btnWidth, btnHeight, android.graphics.Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(bitmap)
+        val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+        paint.color = colorInt
+        val rect = android.graphics.RectF(0f, 0f, btnWidth.toFloat(), btnHeight.toFloat())
+        canvas.drawRoundRect(rect, radius, radius, paint)
+
+        views.setImageViewBitmap(R.id.btn_smoke_bg, bitmap)
 
         val tipText = when {
             todayCount == 0 -> context.getString(R.string.widget_tip_no_smoke)
@@ -151,7 +169,7 @@ class SmokeWidgetProvider : AppWidgetProvider() {
             context, 1, openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        views.setOnClickPendingIntent(R.id.layout_count_area, openPending)
+        views.setOnClickPendingIntent(R.id.widget_root, openPending)
 
         return views
     }

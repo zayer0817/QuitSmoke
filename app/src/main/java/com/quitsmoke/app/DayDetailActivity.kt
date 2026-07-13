@@ -35,13 +35,29 @@ class DayDetailActivity : BaseActivity() {
         binding.recyclerDayDetail.layoutManager = LinearLayoutManager(this)
 
         currentDateStr = intent.getStringExtra(EXTRA_DATE) ?: repo.getTodayStr()
-        binding.tvDayDetailTitle.text = currentDateStr
+        binding.toolbar.title = currentDateStr
 
-        binding.btnBackDayDetail.setOnClickListener {
-            finish()
-        }
+        binding.toolbar.setNavigationOnClickListener { finish() }
 
         loadDetail(currentDateStr)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        applyThemeColor()
+    }
+
+    private fun applyThemeColor() {
+        val color = AppPreferences.getCachedThemeColor(this)
+        val colorInt = android.graphics.Color.parseColor(color)
+
+        // Toolbar
+        binding.toolbar.setBackgroundColor(colorInt)
+        binding.toolbar.setTitleTextColor(android.graphics.Color.WHITE)
+        binding.toolbar.navigationIcon?.setTint(android.graphics.Color.WHITE)
+
+        // Status bar
+        window.statusBarColor = colorInt
     }
 
     private fun loadDetail(dateStr: String) {

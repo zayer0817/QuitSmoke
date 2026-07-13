@@ -17,6 +17,7 @@ private const val PREFS_NAME = "quitsmoke_prefs"
 private const val KEY_THEME_MODE_NAME = "theme_mode"
 private const val KEY_DAILY_TARGET_NAME = "daily_target"
 private const val KEY_TRACKING_START_DATE_NAME = "tracking_start_date"
+private const val KEY_THEME_COLOR_NAME = "theme_color"
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = PREFS_NAME,
@@ -30,6 +31,7 @@ object AppPreferences {
     private val KEY_THEME_MODE = intPreferencesKey(KEY_THEME_MODE_NAME)
     private val KEY_DAILY_TARGET = intPreferencesKey(KEY_DAILY_TARGET_NAME)
     private val KEY_TRACKING_START_DATE = stringPreferencesKey(KEY_TRACKING_START_DATE_NAME)
+    private val KEY_THEME_COLOR = stringPreferencesKey(KEY_THEME_COLOR_NAME)
 
     const val MODE_SYSTEM = 0
     const val MODE_LIGHT = 1
@@ -38,6 +40,17 @@ object AppPreferences {
     const val DEFAULT_DAILY_TARGET = 10
     const val MIN_DAILY_TARGET = 1
     const val MAX_DAILY_TARGET = 99
+
+    const val DEFAULT_THEME_COLOR = "#2E6B2A"
+
+    val PRESET_COLORS = listOf(
+        "#2E6B2A", // 绿色
+        "#1565C0", // 蓝色
+        "#6750A4", // 紫色
+        "#E65100", // 橙色
+        "#AD1457", // 粉色
+        "#00695C", // 青色
+    )
 
     fun getThemeModeFlow(context: Context): Flow<Int> =
         context.dataStore.data.map { it[KEY_THEME_MODE] ?: MODE_SYSTEM }
@@ -111,6 +124,27 @@ object AppPreferences {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .putString(KEY_TRACKING_START_DATE_NAME, dateStr)
+            .apply()
+    }
+
+    fun getThemeColorFlow(context: Context): Flow<String> =
+        context.dataStore.data.map { it[KEY_THEME_COLOR] ?: DEFAULT_THEME_COLOR }
+
+    suspend fun getThemeColor(context: Context): String =
+        getThemeColorFlow(context).first()
+
+    fun getCachedThemeColor(context: Context): String {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_THEME_COLOR_NAME, DEFAULT_THEME_COLOR) ?: DEFAULT_THEME_COLOR
+    }
+
+    suspend fun setThemeColor(context: Context, color: String) {
+        context.dataStore.edit {
+            it[KEY_THEME_COLOR] = color
+        }
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_THEME_COLOR_NAME, color)
             .apply()
     }
 }

@@ -1,24 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 深色模式颜色 -->
 <resources>
-    <color name="bg_main">#0D0D1A</color>
-    <color name="card_bg">#1E1E32</color>
-    <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#B3FFFFFF</color>
-    <color name="text_hint">#80FFFFFF</color>
-    <color name="green_good">#4CAF50</color>
-    <color name="yellow_warn">#FFC107</color>
-    <color name="orange_alert">#FF9800</color>
-    <color name="red_danger">#F44336</color>
-    <color name="red_dark">#B71C1C</color>
-    <color name="btn_smoke_start">#FF6B6B</color>
-    <color name="btn_smoke_end">#EE5A24</color>
-    <color name="teal_calm">#80CBC4</color>
-    <color name="btn_secondary_bg">#33FFFFFF</color>
-    <color name="widget_bg">#991B1B2F</color>
-    <color name="status_bar">#0D0D1A</color>
-    <color name="nav_bar">#0D0D1A</color>
-    <color name="bar_highlight_stroke">#80FFFFFF</color>
-    <color name="green_light">#66BB6A</color>
+    <!-- Dark Mode - Neutral dark base -->
+    <color name="md_theme_primary">#94D48C</color>
+    <color name="md_theme_onPrimary">#003900</color>
+    <color name="md_theme_primaryContainer">#005300</color>
+    <color name="md_theme_onPrimaryContainer">#AFF0A6</color>
+
+    <color name="md_theme_secondary">#CCC2DC</color>
+    <color name="md_theme_onSecondary">#332D41</color>
+    <color name="md_theme_secondaryContainer">#4A4458</color>
+    <color name="md_theme_onSecondaryContainer">#E8DEF8</color>
+
+    <color name="md_theme_tertiary">#EFB8C8</color>
+    <color name="md_theme_onTertiary">#492532</color>
+    <color name="md_theme_tertiaryContainer">#633B48</color>
+    <color name="md_theme_onTertiaryContainer">#FFD8E4</color>
+
+    <color name="md_theme_error">#F2B8B5</color>
+    <color name="md_theme_onError">#601410</color>
+    <color name="md_theme_errorContainer">#8C1D18</color>
+    <color name="md_theme_onErrorContainer">#F9DEDC</color>
+
+    <color name="md_theme_background">#1C1B1F</color>
+    <color name="md_theme_onBackground">#E6E1E5</color>
+    <color name="md_theme_surface">#2B2930</color>
+    <color name="md_theme_onSurface">#E6E1E5</color>
+    <color name="md_theme_surfaceVariant">#49454F</color>
+    <color name="md_theme_onSurfaceVariant">#CAC4D0</color>
+
+    <color name="md_theme_outline">#938F99</color>
+    <color name="md_theme_outlineVariant">#49454F</color>
+
+    <!-- Legacy colors for drawables -->
+    <color name="bg_main">#1C1B1F</color>
+    <color name="card_bg">#2B2930</color>
+    <color name="text_primary">#E6E1E5</color>
+    <color name="text_secondary">#CAC4D0</color>
+    <color name="text_hint">#938F99</color>
+    <color name="green_good">#94D48C</color>
+    <color name="yellow_warn">#E0C068</color>
+    <color name="orange_alert">#FFB77C</color>
+    <color name="red_danger">#F2B8B5</color>
+    <color name="red_dark">#FF897D</color>
+    <color name="btn_secondary_bg">#49454F</color>
+    <color name="widget_bg">#4049454F</color>
+    <color name="status_bar">#1C1B1F</color>
+    <color name="nav_bar">#1C1B1F</color>
+    <color name="bar_highlight_stroke">#CAC4D0</color>
+    <color name="green_light">#94D48C</color>
     <color name="white">#FFFFFF</color>
+    <color name="card_stroke">#49454F</color>
+    <color name="teal_calm">#A0CFCF</color>
+    <color name="btn_smoke_start">#94D48C</color>
+    <color name="btn_smoke_end">#94D48C</color>
 </resources>

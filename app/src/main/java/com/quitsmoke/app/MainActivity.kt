@@ -1,6 +1,7 @@
 package com.quitsmoke.app
 
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.View
@@ -19,16 +20,19 @@ import java.util.*
 
 class MainActivity : BaseActivity() {
 
-    override val useTransparentStatusBar: Boolean = true
-
     private lateinit var binding: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
+    
+    private var themeColor: Int = Color.parseColor("#2E6B2A")
+    private var themeColorLight: Int = Color.parseColor("#4E8B32")
+    private var themeColorDark: Int = Color.parseColor("#1B5E20")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupToolbar()
         setupListeners()
 
         lifecycleScope.launch {
@@ -49,6 +53,68 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.loadData()
+        applyThemeColor()
+    }
+
+    private fun applyThemeColor() {
+        val color = AppPreferences.getCachedThemeColor(this)
+        themeColor = Color.parseColor(color)
+        themeColorLight = lightenColor(themeColor, 0.3f)
+        themeColorDark = darkenColor(themeColor, 0.2f)
+
+        // Toolbar
+        binding.toolbar.setBackgroundColor(themeColor)
+        binding.toolbar.setTitleTextColor(Color.WHITE)
+        binding.toolbar.overflowIcon?.setTint(Color.WHITE)
+        for (i in 0 until binding.toolbar.menu.size()) {
+            binding.toolbar.menu.getItem(i).icon?.setTint(Color.WHITE)
+        }
+
+        // Filled button
+        binding.btnSmokeMain.backgroundTintList = android.content.res.ColorStateList.valueOf(themeColor)
+        binding.btnSmokeMain.setTextColor(Color.WHITE)
+
+        // Outlined button
+        binding.btnUndo.setTextColor(themeColor)
+        binding.btnUndo.strokeColor = android.content.res.ColorStateList.valueOf(themeColor)
+
+        // Goal streak text
+        binding.tvGoalStreak.setTextColor(themeColor)
+        binding.tvNoSmokeStreak.setTextColor(themeColorLight)
+
+        // Status bar
+        window.statusBarColor = themeColor
+
+        // 强制重绘柱状图——因为 StateFlow 在数据不变时不会 emit，
+        // 所以即使主题色变了，collect 也不会触发 updateBars()
+        viewModel.uiState.value.weekReport?.let { updateBars(it.dailyStats) }
+        viewModel.uiState.value.weekReport?.let { updateWeekSection(it) }
+        viewModel.uiState.value.goalReport?.let { updateGoalSection(it) }
+        viewModel.uiState.value.let { updateTodaySection(it.todayCount, it.dailyTarget) }
+        if (viewModel.uiState.value.weekReport != null) {
+            updateAdvice(
+                viewModel.uiState.value.todayCount,
+                viewModel.uiState.value.dailyTarget,
+                viewModel.uiState.value.weekReport!!,
+                viewModel.uiState.value.hourlyStats
+            )
+        }
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_add -> {
+                    startActivity(Intent(this, AddRecordActivity::class.java))
+                    true
+                }
+                R.id.action_settings -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun setupListeners() {
@@ -61,14 +127,6 @@ class MainActivity : BaseActivity() {
                 if (success) notifyWidgetUpdate()
             }
         }
-
-        binding.btnAddManual.setOnClickListener {
-            startActivity(Intent(this, AddRecordActivity::class.java))
-        }
-
-        binding.btnSettings.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
     }
 
     private fun updateTodaySection(count: Int, dailyTarget: Int) {
@@ -80,19 +138,24 @@ class MainActivity : BaseActivity() {
             getString(R.string.target_exceeded, count, dailyTarget, count - dailyTarget)
         }
 
-        val (tip, color) = when {
-            count == 0 -> getString(R.string.today_tip_no_smoke) to getColor(R.color.green_good)
-            count <= dailyTarget -> getString(R.string.today_tip_on_target) to getColor(R.color.green_good)
-            count <= 5 -> getString(R.string.today_tip_mild) to getColor(R.color.yellow_warn)
-            count <= 10 -> getString(R.string.today_tip_moderate) to getColor(R.color.orange_alert)
-            count <= 20 -> getString(R.string.today_tip_heavy) to getColor(R.color.red_danger)
-            else -> getString(R.string.today_tip_severe) to getColor(R.color.red_dark)
+        val (tipArrayRes, color) = when {
+            count == 0 -> R.array.today_tips_no_smoke to themeColor
+            count <= dailyTarget -> R.array.today_tips_on_target to themeColor
+            count <= 5 -> R.array.today_tips_mild to themeColorLight
+            count <= 10 -> R.array.today_tips_moderate to themeColorDark
+            count <= 20 -> R.array.today_tips_heavy to themeColor
+            else -> R.array.today_tips_severe to themeColorLight
         }
-        binding.tvTodayTip.text = tip
+        binding.tvTodayTip.text = getRandomStringFromArray(tipArrayRes)
         binding.tvTodayTip.setTextColor(color)
         binding.tvTodayTarget.setTextColor(
-            if (count <= dailyTarget) getColor(R.color.green_good) else getColor(R.color.red_danger)
+            if (count <= dailyTarget) themeColor else themeColorLight
         )
+    }
+
+    private fun getRandomStringFromArray(arrayResId: Int): String {
+        val array = resources.getStringArray(arrayResId)
+        return array.random()
     }
 
     private fun updateGoalSection(report: com.quitsmoke.app.data.GoalReport) {
@@ -120,9 +183,9 @@ class MainActivity : BaseActivity() {
         binding.tvTrend.text = trendText
         binding.tvTrend.setTextColor(
             when (report.trend) {
-                -1 -> getColor(R.color.green_good)
-                1 -> getColor(R.color.red_danger)
-                else -> getColor(R.color.yellow_warn)
+                -1 -> themeColor
+                1 -> themeColorLight
+                else -> themeColorDark
             }
         )
     }
@@ -148,11 +211,11 @@ class MainActivity : BaseActivity() {
             barBinding.viewBar.layoutParams = layoutParams
 
             val barColor = when {
-                stat.count == 0 -> getColor(R.color.green_good)
-                stat.count <= 5 -> getColor(R.color.green_light)
-                stat.count <= 10 -> getColor(R.color.yellow_warn)
-                stat.count <= 20 -> getColor(R.color.orange_alert)
-                else -> getColor(R.color.red_danger)
+                stat.count == 0 -> themeColor
+                stat.count <= 3 -> themeColorLight
+                stat.count <= 6 -> themeColor
+                stat.count <= 10 -> themeColorDark
+                else -> darkenColor(themeColorDark, 0.15f)
             }
             barBinding.viewBar.background = createBarBackground(barColor, stat.dateStr == todayStr)
 
@@ -196,17 +259,19 @@ class MainActivity : BaseActivity() {
                 in 18..20 -> getString(R.string.hour_evening, it.hourOfDay)
                 else -> getString(R.string.hour_night, it.hourOfDay)
             }
-            getString(R.string.reminder_peak_hour, timeRange)
+            val templates = resources.getStringArray(R.array.reminders_peak_hour)
+            templates.random().format(timeRange)
         }
 
-        binding.tvAdvice.text = peakHint ?: when {
-            todayCount == 0 -> getString(R.string.reminder_no_smoke_today)
-            todayCount > dailyTarget -> getString(R.string.reminder_over_target)
-            weekReport.trend == -1 -> getString(R.string.reminder_trend_down)
-            weekReport.trend == 1 -> getString(R.string.reminder_trend_up)
-            weekReport.avgDaily.toFloatOrNull()?.let { it >= 10f } == true -> getString(R.string.reminder_heavy)
-            else -> getString(R.string.reminder_normal)
+        val adviceText = peakHint ?: when {
+            todayCount == 0 -> getRandomStringFromArray(R.array.reminders_no_smoke_today)
+            todayCount > dailyTarget -> getRandomStringFromArray(R.array.reminders_over_target)
+            weekReport.trend == -1 -> getRandomStringFromArray(R.array.reminders_trend_down)
+            weekReport.trend == 1 -> getRandomStringFromArray(R.array.reminders_trend_up)
+            weekReport.avgDaily.toFloatOrNull()?.let { it >= 10f } == true -> getRandomStringFromArray(R.array.reminders_heavy)
+            else -> getRandomStringFromArray(R.array.reminders_normal)
         }
+        binding.tvAdvice.text = adviceText
     }
 
     private fun notifyWidgetUpdate() {
@@ -221,7 +286,7 @@ class MainActivity : BaseActivity() {
             if (isToday) {
                 setStroke(
                     (2f * resources.displayMetrics.density).toInt().coerceAtLeast(1),
-                    resources.getColor(R.color.bar_highlight_stroke, theme)
+                    Color.WHITE
                 )
             }
         }

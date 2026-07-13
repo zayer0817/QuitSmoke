@@ -1,6 +1,7 @@
 package com.quitsmoke.app
 
 import android.app.Application
+import android.graphics.Color
 
 class QuitSmokeApp : Application() {
 

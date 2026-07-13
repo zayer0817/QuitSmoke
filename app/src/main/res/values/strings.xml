@@ -15,17 +15,12 @@
     <string name="btn_add_manual">添加</string>
     <string name="btn_settings">设置</string>
     <string name="today_smoked">今日已抽</string>
-    <string name="today_tip_no_smoke">今天还没有抽烟，坚持住！</string>
-    <string name="today_tip_on_target">仍在今日目标内，稳住节奏</string>
-    <string name="today_tip_mild">还行，控制住自己</string>
-    <string name="today_tip_moderate">有点多了，注意控制</string>
-    <string name="today_tip_heavy">太多了，要克制！</string>
-    <string name="today_tip_severe">严重超标！请立即停止！</string>
     <string name="target_on_track">目标 %1$d/%2$d，还可 %3$d 根</string>
     <string name="target_exceeded">目标 %1$d/%2$d，已超出 %3$d 根</string>
-    <string name="btn_undo">↩ 撤销</string>
-    <string name="btn_smoke">🚬 抽一根</string>
-    <string name="section_goal_tracking">🎯 目标追踪</string>
+    <string name="btn_undo">撤销</string>
+    <string name="btn_smoke">抽一根</string>
+    <string name="btn_smoke_alt">来一根</string>
+    <string name="section_goal_tracking">目标追踪</string>
     <string name="label_consecutive_target">连续达标</string>
     <string name="label_consecutive_no_smoke">连续无烟</string>
     <string name="month_summary_format">本月 %1$d 根，日均 %2$s 根/天\n%3$d 天中达标 %4$d 天，无烟 %5$d 天</string>
@@ -33,11 +28,60 @@
     <string name="label_week_total">本周总计</string>
     <string name="label_daily_avg">日均</string>
     <string name="label_trend">趋势</string>
-    <string name="trend_flat">→ 持平</string>
-    <string name="trend_down">↓ 比上周减少了 %d 根</string>
-    <string name="trend_up">↑ 比上周增加了 %d 根</string>
-    <string name="section_7day_trend">📈 近期趋势</string>
-    <string name="section_advice">💡 今日提醒</string>
+    <string name="trend_flat">持平</string>
+    <string name="trend_down">比上周减少了 %d 根</string>
+    <string name="trend_up">比上周增加了 %d 根</string>
+    <string name="section_7day_trend">近期趋势</string>
+    <string name="section_advice">今日提醒</string>
+
+    <!-- 今日提示（随机显示） -->
+    <string-array name="today_tips_no_smoke">
+        <item>今天还没有抽烟，坚持住</item>
+        <item>又是新的一天，继续保持</item>
+        <item>今天状态不错，继续加油</item>
+        <item>无烟的一天，值得记录</item>
+        <item>今天还没开始，挺好的</item>
+    </string-array>
+
+    <string-array name="today_tips_on_target">
+        <item>仍在今日目标内，稳住节奏</item>
+        <item>还在控制范围内，继续保持</item>
+        <item>今天的量还可以，别再加了</item>
+        <item>目标内，还有余地但别放松</item>
+        <item>今天控制得不错，见好就收</item>
+    </string-array>
+
+    <string-array name="today_tips_mild">
+        <item>今天抽了几根，控制一下</item>
+        <item>量不大，但要注意了</item>
+        <item>今天还可以，别再加了</item>
+        <item>几根而已，今天到此为止吧</item>
+        <item>今天抽了几根，收住吧</item>
+    </string-array>
+
+    <string-array name="today_tips_moderate">
+        <item>今天有点多了，注意控制</item>
+        <item>今天的量偏高，该收手了</item>
+        <item>今天抽了不少，克制一下</item>
+        <item>量有点大，今天别再抽了</item>
+        <item>今天抽得有点多，停一停</item>
+    </string-array>
+
+    <string-array name="today_tips_heavy">
+        <item>今天抽太多了，必须克制</item>
+        <item>今天的量严重超标，停下来</item>
+        <item>今天抽得太多，对自己负责</item>
+        <item>今天量太大了，别再抽了</item>
+        <item>今天已经很多了，该停了</item>
+    </string-array>
+
+    <string-array name="today_tips_severe">
+        <item>今天严重超标，请立即停止</item>
+        <item>今天的量太夸张了，必须停</item>
+        <item>今天抽得太多，想想健康</item>
+        <item>今天已经爆表了，别再抽了</item>
+        <item>今天量太大，为身体想想</item>
+    </string-array>
 
     <!-- 时段分析 -->
     <string name="hour_dawn">凌晨 %d:00</string>
@@ -47,41 +91,95 @@
     <string name="hour_afternoon">下午 %d:00</string>
     <string name="hour_evening">傍晚 %d:00</string>
     <string name="hour_night">晚上 %d:00</string>
-    <string name="reminder_no_smoke_today">今天还没记录，先稳住这一口。</string>
-    <string name="reminder_over_target">已经超过目标了，下一根先等等 5 分钟。</string>
-    <string name="reminder_trend_down">比前一段少了，挺好，别急着奖励自己一根。</string>
-    <string name="reminder_trend_up">最近有点往上走，下一根先往后推一会儿。</string>
-    <string name="reminder_heavy">最近量偏高，先把今天剩下的时间稳住。</string>
-    <string name="reminder_peak_hour">最近 %s 更容易抽，提前准备点替代动作。</string>
-    <string name="reminder_normal">今天还在可控范围内，先把下一根往后推一会儿。</string>
+
+    <!-- 今日提醒（随机显示） -->
+    <string-array name="reminders_no_smoke_today">
+        <item>今天还没记录，先稳住这一口</item>
+        <item>今天还没开始，这是好事</item>
+        <item>今天还没抽，继续保持</item>
+        <item>今天还没记录，说明你控制住了</item>
+        <item>今天还没开始，给自己点个赞</item>
+    </string-array>
+
+    <string-array name="reminders_over_target">
+        <item>已经超过目标了，下一根先等等</item>
+        <item>今天超标了，下一根缓一缓</item>
+        <item>目标已超出，今天到此为止</item>
+        <item>今天超标了，克制一下</item>
+        <item>目标已破，今天别再抽了</item>
+    </string-array>
+
+    <string-array name="reminders_trend_down">
+        <item>比前一段少了，挺好，继续</item>
+        <item>最近在减少，保持这个势头</item>
+        <item>趋势在下降，做得不错</item>
+        <item>最近量在减少，继续保持</item>
+        <item>比之前少了，说明在进步</item>
+    </string-array>
+
+    <string-array name="reminders_trend_up">
+        <item>最近有点往上走，注意控制</item>
+        <item>最近量在增加，该收一收了</item>
+        <item>趋势在上升，克制一下</item>
+        <item>最近抽得多了，注意一下</item>
+        <item>最近量在涨，今天少抽点</item>
+    </string-array>
+
+    <string-array name="reminders_heavy">
+        <item>最近量偏高，先把今天稳住</item>
+        <item>最近抽得有点多，注意控制</item>
+        <item>最近量偏高，今天克制一下</item>
+        <item>最近抽得不少，今天收一收</item>
+        <item>最近量有点大，今天少抽点</item>
+    </string-array>
+
+    <string-array name="reminders_peak_hour">
+        <item>最近 %s 更容易抽，准备点替代动作</item>
+        <item>最近 %s 是高峰，提前想好干嘛</item>
+        <item>最近 %s 抽得多，找点事做</item>
+        <item>最近 %s 容易犯瘾，准备点零食</item>
+        <item>最近 %s 是高峰，提前安排点活动</item>
+    </string-array>
+
+    <string-array name="reminders_normal">
+        <item>今天还在可控范围内，继续稳住</item>
+        <item>今天量还行，别再加了</item>
+        <item>今天控制得可以，见好就收</item>
+        <item>今天还在正常范围，保持住</item>
+        <item>今天量还可以，今天到这吧</item>
+    </string-array>
 
     <!-- SettingsActivity -->
     <string name="title_settings">设置</string>
     <string name="section_function">功能</string>
-    <string name="menu_history">📋 历史记录</string>
+    <string name="menu_history">历史记录</string>
     <string name="section_goal">目标</string>
     <string name="label_daily_target">每日上限</string>
     <string name="target_format">目标：%d 根/天</string>
-    <string name="btn_target_minus">－ 减少</string>
-    <string name="btn_target_plus">＋ 增加</string>
+    <string name="btn_target_minus">减少</string>
+    <string name="btn_target_plus">增加</string>
     <string name="section_appearance">外观</string>
     <string name="label_theme_mode">主题模式</string>
     <string name="current_theme_format">当前：%s</string>
     <string name="theme_system">跟随系统</string>
-    <string name="theme_light">☀️ 浅色</string>
-    <string name="theme_dark">🌙 深色</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
+    <string name="label_theme_color">主题颜色</string>
+    <string name="btn_custom_color">自定义颜色</string>
+    <string name="dialog_pick_color">选择主题颜色</string>
     <string name="section_data">数据管理</string>
     <string name="label_export_import">导出与导入</string>
     <string name="label_export_import_desc">导出数据到CSV文件或从CSV文件导入恢复</string>
     <string name="total_records_format">当前记录：%d 条</string>
-    <string name="btn_export">📤 导出数据</string>
-    <string name="btn_import">📥 导入数据</string>
+    <string name="btn_export">导出数据</string>
+    <string name="btn_import">导入数据</string>
     <string name="section_about">关于</string>
     <string name="app_version_format">抽了吗 v%s</string>
     <string name="about_quote">每一次点击，都是对自己的觉察。\n你比你想象的更强大。</string>
     <string name="confirm_import">确认导入</string>
     <string name="import_preview_format">将新增 %1$d 条记录\n跳过重复 %2$d 条\n无效记录 %3$d 条</string>
     <string name="btn_cancel">取消</string>
+    <string name="btn_confirm">确定</string>
     <string name="btn_import_confirm">导入</string>
     <string name="export_success">导出成功！共 %d 条记录</string>
     <string name="export_failed">导出失败：%s</string>
@@ -94,15 +192,15 @@
     <string name="history_count_format">%d 根</string>
 
     <!-- HistoryAdapter -->
-    <string name="level_none">无烟日 🎉</string>
-    <string name="level_light">轻度 🟢</string>
-    <string name="level_moderate">中度 🟡</string>
-    <string name="level_heavy">重度 🟠</string>
-    <string name="level_severe">严重 🔴</string>
+    <string name="level_none">无烟日</string>
+    <string name="level_light">轻度</string>
+    <string name="level_moderate">中度</string>
+    <string name="level_heavy">重度</string>
+    <string name="level_severe">严重</string>
 
     <!-- DayDetailActivity -->
     <string name="title_day_detail">记录详情</string>
-    <string name="day_detail_empty">🎉 这一天没有抽烟记录</string>
+    <string name="day_detail_empty">这一天没有抽烟记录</string>
     <string name="detail_index_format">第 %d 根</string>
     <string name="confirm_delete_title">删除记录</string>
     <string name="confirm_delete_message">确定删除 %s 的记录吗？</string>
@@ -111,15 +209,15 @@
 
     <!-- AddRecordActivity -->
     <string name="title_add_record">手动添加记录</string>
-    <string name="label_date">📅 日期</string>
-    <string name="label_time">🕐 时间</string>
-    <string name="label_trigger">🏷️ 触发原因</string>
+    <string name="label_date">日期</string>
+    <string name="label_time">时间</string>
+    <string name="label_trigger">触发原因</string>
     <string name="btn_pick_date">选择日期</string>
     <string name="btn_pick_time">选择时间</string>
     <string name="btn_pick_reason">选择原因</string>
     <string name="reason_not_selected">未选择</string>
-    <string name="btn_confirm_add">✓ 确认添加</string>
-    <string name="add_record_tip">💡 手动添加的记录会计入当天统计，也会在历史记录中显示</string>
+    <string name="btn_confirm_add">确认添加</string>
+    <string name="add_record_tip">手动添加的记录会计入当天统计，也会在历史记录中显示</string>
     <string name="select_trigger_reason">选择触发原因</string>
     <string name="btn_clear">清除</string>
     <string name="toast_added">已添加：%1$s %2$s</string>
@@ -136,18 +234,18 @@
 
     <!-- Widget -->
     <string name="widget_today_unit">根 / 今日</string>
-    <string name="widget_tip_no_smoke">今天还没有抽烟，坚持住！</string>
+    <string name="widget_tip_no_smoke">今天还没有抽烟，坚持住</string>
     <string name="widget_tip_on_target">目标内，还可 %d 根</string>
-    <string name="widget_tip_mild">还行，控制住自己</string>
-    <string name="widget_tip_moderate">有点多了，注意控制</string>
-    <string name="widget_tip_heavy">太多了，要克制！</string>
-    <string name="widget_tip_severe">严重超标！请立即停止！</string>
+    <string name="widget_tip_mild">今天抽了几根，控制一下</string>
+    <string name="widget_tip_moderate">今天有点多了，注意控制</string>
+    <string name="widget_tip_heavy">今天抽太多了，必须克制</string>
+    <string name="widget_tip_severe">今天严重超标，请立即停止</string>
 
     <!-- SmokeActionReceiver -->
     <string name="toast_recorded_low">已记录，今天第 %d 根</string>
     <string name="toast_recorded_mid">已记录，今天第 %d 根，注意控制</string>
-    <string name="toast_recorded_high">今天第 %d 根了，尽量克制！</string>
-    <string name="toast_recorded_severe">今天已经 %d 根了！为了健康请停下来</string>
+    <string name="toast_recorded_high">今天第 %d 根了，尽量克制</string>
+    <string name="toast_recorded_severe">今天已经 %d 根了，为了健康请停下来</string>
     <string name="toast_undo_success">已撤销，当前 %d 根</string>
     <string name="toast_undo_empty">没有可撤销的记录</string>
     <string name="toast_rapid_record">连续记录 %1$d 次，间隔 %2$d 分钟</string>

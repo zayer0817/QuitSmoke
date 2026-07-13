@@ -3,6 +3,7 @@ package com.quitsmoke.app
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -50,6 +51,7 @@ class SettingsActivity : BaseActivity() {
 
         repo = SmokeRepository.getInstance(this)
         binding.tvAppVersion.text = getString(R.string.app_version_format, BuildConfig.VERSION_NAME)
+        setupToolbar()
         setupListeners()
         lifecycleScope.launch {
             updateThemeUI()
@@ -58,11 +60,79 @@ class SettingsActivity : BaseActivity() {
         }
     }
 
-    private fun setupListeners() {
-        binding.btnBackSettings.setOnClickListener {
-            finish()
+    override fun onResume() {
+        super.onResume()
+        applyThemeColor()
+    }
+
+    private fun applyThemeColor() {
+        val color = AppPreferences.getCachedThemeColor(this)
+        val colorInt = android.graphics.Color.parseColor(color)
+
+        // Toolbar
+        binding.toolbar.setBackgroundColor(colorInt)
+        binding.toolbar.setTitleTextColor(android.graphics.Color.WHITE)
+        binding.toolbar.navigationIcon?.setTint(android.graphics.Color.WHITE)
+
+        // All filled buttons - set background tint and white text
+        val filledButtons = listOf(
+            binding.btnTargetPlus,
+            binding.btnImport
+        )
+        for (btn in filledButtons) {
+            btn.backgroundTintList = android.content.res.ColorStateList.valueOf(colorInt)
+            btn.setTextColor(android.graphics.Color.WHITE)
         }
 
+        // All outlined buttons - set stroke color and theme text color
+        val outlinedButtons = listOf(
+            binding.btnTargetMinus,
+            binding.btnExport,
+            binding.btnCustomColor,
+            binding.btnThemeSystem,
+            binding.btnThemeLight,
+            binding.btnThemeDark
+        )
+        for (btn in outlinedButtons) {
+            btn.setTextColor(colorInt)
+            btn.strokeColor = android.content.res.ColorStateList.valueOf(colorInt)
+        }
+
+        // Update color circle selection highlight
+        updateColorCircleSelection(color)
+
+        // Status bar
+        window.statusBarColor = colorInt
+    }
+
+    private fun updateColorCircleSelection(selectedColor: String) {
+        val colorViews = mapOf(
+            binding.colorGreen to "#2E6B2A",
+            binding.colorBlue to "#1565C0",
+            binding.colorPurple to "#6750A4",
+            binding.colorOrange to "#E65100",
+            binding.colorPink to "#AD1457",
+            binding.colorTeal to "#00695C"
+        )
+
+        for ((view, presetColor) in colorViews) {
+            val drawable = android.graphics.drawable.GradientDrawable()
+            drawable.shape = android.graphics.drawable.GradientDrawable.OVAL
+            drawable.setColor(android.graphics.Color.parseColor(presetColor))
+            if (presetColor.equals(selectedColor, ignoreCase = true)) {
+                drawable.setStroke(4, android.graphics.Color.WHITE)
+            }
+            view.background = drawable
+        }
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener {
+            finish()
+        }
+    }
+
+    private fun setupListeners() {
         binding.itemHistory.setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
@@ -71,11 +141,158 @@ class SettingsActivity : BaseActivity() {
         binding.btnThemeLight.setOnClickListener { switchTheme(AppPreferences.MODE_LIGHT) }
         binding.btnThemeDark.setOnClickListener { switchTheme(AppPreferences.MODE_DARK) }
 
+        binding.colorGreen.setOnClickListener { switchThemeColor("#2E6B2A") }
+        binding.colorBlue.setOnClickListener { switchThemeColor("#1565C0") }
+        binding.colorPurple.setOnClickListener { switchThemeColor("#6750A4") }
+        binding.colorOrange.setOnClickListener { switchThemeColor("#E65100") }
+        binding.colorPink.setOnClickListener { switchThemeColor("#AD1457") }
+        binding.colorTeal.setOnClickListener { switchThemeColor("#00695C") }
+
+        binding.btnCustomColor.setOnClickListener { showColorPickerDialog() }
+
         binding.btnTargetMinus.setOnClickListener { adjustDailyTarget(-1) }
         binding.btnTargetPlus.setOnClickListener { adjustDailyTarget(1) }
 
         binding.btnExport.setOnClickListener { exportData() }
         binding.btnImport.setOnClickListener { importData() }
+    }
+
+    private fun switchThemeColor(color: String) {
+        // Apply immediately for fast UI response
+        applyThemeColorDirect(color)
+        
+        lifecycleScope.launch {
+            AppPreferences.setThemeColor(this@SettingsActivity, color)
+            updateThemeColorUI()
+            // 通知小组件刷新按钮颜色
+            SmokeWidgetProvider.notifyWidgetUpdate(this@SettingsActivity)
+        }
+    }
+
+    private fun applyThemeColorDirect(color: String) {
+        val colorInt = android.graphics.Color.parseColor(color)
+
+        // Toolbar
+        binding.toolbar.setBackgroundColor(colorInt)
+        binding.toolbar.setTitleTextColor(android.graphics.Color.WHITE)
+        binding.toolbar.navigationIcon?.setTint(android.graphics.Color.WHITE)
+
+        // All filled buttons
+        val filledButtons = listOf(binding.btnTargetPlus, binding.btnImport)
+        for (btn in filledButtons) {
+            btn.backgroundTintList = android.content.res.ColorStateList.valueOf(colorInt)
+            btn.setTextColor(android.graphics.Color.WHITE)
+        }
+
+        // All outlined buttons
+        val outlinedButtons = listOf(
+            binding.btnTargetMinus, binding.btnExport, binding.btnCustomColor,
+            binding.btnThemeSystem, binding.btnThemeLight, binding.btnThemeDark
+        )
+        for (btn in outlinedButtons) {
+            btn.setTextColor(colorInt)
+            btn.strokeColor = android.content.res.ColorStateList.valueOf(colorInt)
+        }
+
+        // Update color circle selection highlight
+        updateColorCircleSelection(color)
+
+        // Status bar
+        window.statusBarColor = colorInt
+    }
+
+    private fun updateThemeColorUI() {
+        val currentColor = AppPreferences.getCachedThemeColor(this)
+        binding.tvThemeColor.text = currentColor
+        
+        // Highlight the selected color circle
+        val colorViews = listOf(
+            binding.colorGreen to "#2E6B2A",
+            binding.colorBlue to "#1565C0",
+            binding.colorPurple to "#6750A4",
+            binding.colorOrange to "#E65100",
+            binding.colorPink to "#AD1457",
+            binding.colorTeal to "#00695C"
+        )
+        
+        for ((view, presetColor) in colorViews) {
+            if (presetColor.equals(currentColor, ignoreCase = true)) {
+                // Add a border to indicate selection
+                val drawable = android.graphics.drawable.GradientDrawable()
+                drawable.shape = android.graphics.drawable.GradientDrawable.OVAL
+                drawable.setColor(android.graphics.Color.parseColor(presetColor))
+                drawable.setStroke(4, android.graphics.Color.WHITE)
+                view.background = drawable
+            } else {
+                // Reset to default circle
+                val drawable = android.graphics.drawable.GradientDrawable()
+                drawable.shape = android.graphics.drawable.GradientDrawable.OVAL
+                drawable.setColor(android.graphics.Color.parseColor(presetColor))
+                view.background = drawable
+            }
+        }
+    }
+
+    private fun showColorPickerDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_color_picker, null)
+        val previewView = dialogView.findViewById<View>(R.id.color_preview)
+        val seekRed = dialogView.findViewById<android.widget.SeekBar>(R.id.seek_red)
+        val seekGreen = dialogView.findViewById<android.widget.SeekBar>(R.id.seek_green)
+        val seekBlue = dialogView.findViewById<android.widget.SeekBar>(R.id.seek_blue)
+        val tvRed = dialogView.findViewById<TextView>(R.id.tv_red_value)
+        val tvGreen = dialogView.findViewById<TextView>(R.id.tv_green_value)
+        val tvBlue = dialogView.findViewById<TextView>(R.id.tv_blue_value)
+
+        // Initialize with current color
+        val currentColor = AppPreferences.getCachedThemeColor(this)
+        val colorInt = android.graphics.Color.parseColor(currentColor)
+        seekRed.progress = android.graphics.Color.red(colorInt)
+        seekGreen.progress = android.graphics.Color.green(colorInt)
+        seekBlue.progress = android.graphics.Color.blue(colorInt)
+        tvRed.text = android.graphics.Color.red(colorInt).toString()
+        tvGreen.text = android.graphics.Color.green(colorInt).toString()
+        tvBlue.text = android.graphics.Color.blue(colorInt).toString()
+        previewView.setBackgroundColor(colorInt)
+
+        val updatePreview = {
+            val r = seekRed.progress
+            val g = seekGreen.progress
+            val b = seekBlue.progress
+            val color = android.graphics.Color.rgb(r, g, b)
+            previewView.setBackgroundColor(color)
+            tvRed.text = r.toString()
+            tvGreen.text = g.toString()
+            tvBlue.text = b.toString()
+        }
+
+        seekRed.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) = updatePreview()
+            override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
+        })
+        seekGreen.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) = updatePreview()
+            override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
+        })
+        seekBlue.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) = updatePreview()
+            override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
+        })
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_pick_color)
+            .setView(dialogView)
+            .setPositiveButton(R.string.btn_confirm) { _, _ ->
+                val r = seekRed.progress
+                val g = seekGreen.progress
+                val b = seekBlue.progress
+                val hexColor = String.format("#%02X%02X%02X", r, g, b)
+                switchThemeColor(hexColor)
+            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
     }
 
     private fun switchTheme(mode: Int) {
@@ -89,19 +306,14 @@ class SettingsActivity : BaseActivity() {
         val currentMode = AppPreferences.getThemeMode(this@SettingsActivity)
         binding.tvThemeMode.text = getString(R.string.current_theme_format, AppPreferences.getModeName(currentMode))
 
-        val activeBg = R.drawable.btn_smoke_bg
-        val inactiveBg = R.drawable.btn_undo_bg
-
-        binding.btnThemeSystem.setBackgroundResource(if (currentMode == AppPreferences.MODE_SYSTEM) activeBg else inactiveBg)
-        binding.btnThemeLight.setBackgroundResource(if (currentMode == AppPreferences.MODE_LIGHT) activeBg else inactiveBg)
-        binding.btnThemeDark.setBackgroundResource(if (currentMode == AppPreferences.MODE_DARK) activeBg else inactiveBg)
-
-        val activeTextColor = getColor(R.color.white)
-        val inactiveTextColor = resources.getColor(R.color.text_primary, theme)
-
-        binding.btnThemeSystem.setTextColor(if (currentMode == AppPreferences.MODE_SYSTEM) activeTextColor else inactiveTextColor)
-        binding.btnThemeLight.setTextColor(if (currentMode == AppPreferences.MODE_LIGHT) activeTextColor else inactiveTextColor)
-        binding.btnThemeDark.setTextColor(if (currentMode == AppPreferences.MODE_DARK) activeTextColor else inactiveTextColor)
+        val buttonId = when (currentMode) {
+            AppPreferences.MODE_SYSTEM -> R.id.btn_theme_system
+            AppPreferences.MODE_LIGHT -> R.id.btn_theme_light
+            AppPreferences.MODE_DARK -> R.id.btn_theme_dark
+            else -> R.id.btn_theme_system
+        }
+        binding.themeToggleGroup.check(buttonId)
+        updateThemeColorUI()
     }
 
     private fun adjustDailyTarget(delta: Int) {

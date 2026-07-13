@@ -29,12 +29,10 @@ class AddRecordActivity : BaseActivity() {
 
         repo = SmokeRepository.getInstance(this)
 
+        binding.toolbar.setNavigationOnClickListener { finish() }
+
         updateDateDisplay()
         updateTimeDisplay()
-
-        binding.btnBackAdd.setOnClickListener {
-            finish()
-        }
 
         binding.btnPickDate.setOnClickListener {
             showDatePicker()
@@ -53,6 +51,46 @@ class AddRecordActivity : BaseActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        applyThemeColor()
+    }
+
+    private fun applyThemeColor() {
+        val color = AppPreferences.getCachedThemeColor(this)
+        val colorInt = android.graphics.Color.parseColor(color)
+
+        // Toolbar
+        binding.toolbar.setBackgroundColor(colorInt)
+        binding.toolbar.setTitleTextColor(android.graphics.Color.WHITE)
+        binding.toolbar.navigationIcon?.setTint(android.graphics.Color.WHITE)
+
+        // Filled button
+        binding.btnConfirmAdd.backgroundTintList = android.content.res.ColorStateList.valueOf(colorInt)
+        binding.btnConfirmAdd.setTextColor(android.graphics.Color.WHITE)
+
+        // Outlined buttons
+        binding.btnPickDate.setTextColor(colorInt)
+        binding.btnPickDate.strokeColor = android.content.res.ColorStateList.valueOf(colorInt)
+        binding.btnPickTime.setTextColor(colorInt)
+        binding.btnPickTime.strokeColor = android.content.res.ColorStateList.valueOf(colorInt)
+        binding.btnPickReason.setTextColor(colorInt)
+        binding.btnPickReason.strokeColor = android.content.res.ColorStateList.valueOf(colorInt)
+
+        // Status bar
+        window.statusBarColor = colorInt
+    }
+
+    private fun updateDateDisplay() {
+        val sdf = SimpleDateFormat("yyyy-MM-dd (EEE)", Locale.CHINESE)
+        binding.tvSelectedDate.text = sdf.format(calendar.time)
+    }
+
+    private fun updateTimeDisplay() {
+        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+        binding.tvSelectedTime.text = sdf.format(calendar.time)
+    }
+
     private fun showDatePicker() {
         DatePickerDialog(
             this,
@@ -66,21 +104,6 @@ class AddRecordActivity : BaseActivity() {
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         ).show()
-    }
-
-    private fun showReasonPicker() {
-        val reasons = resources.getStringArray(R.array.trigger_reasons)
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.select_trigger_reason))
-            .setItems(reasons) { _, which ->
-                selectedReason = reasons[which]
-                binding.tvSelectedReason.text = selectedReason
-            }
-            .setNegativeButton(getString(R.string.btn_clear)) { _, _ ->
-                selectedReason = ""
-                binding.tvSelectedReason.text = getString(R.string.reason_not_selected)
-            }
-            .show()
     }
 
     private fun showTimePicker() {
@@ -98,14 +121,19 @@ class AddRecordActivity : BaseActivity() {
         ).show()
     }
 
-    private fun updateDateDisplay() {
-        val sdf = SimpleDateFormat("yyyy-MM-dd (EEE)", Locale.CHINESE)
-        binding.tvSelectedDate.text = sdf.format(calendar.time)
-    }
-
-    private fun updateTimeDisplay() {
-        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-        binding.tvSelectedTime.text = sdf.format(calendar.time)
+    private fun showReasonPicker() {
+        val reasons = resources.getStringArray(R.array.trigger_reasons)
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.select_trigger_reason))
+            .setItems(reasons) { _, which ->
+                selectedReason = reasons[which]
+                binding.tvSelectedReason.text = selectedReason
+            }
+            .setNegativeButton(getString(R.string.btn_clear)) { _, _ ->
+                selectedReason = ""
+                binding.tvSelectedReason.text = getString(R.string.reason_not_selected)
+            }
+            .show()
     }
 
     private fun saveRecord() {

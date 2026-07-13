@@ -1,49 +1,33 @@
 package com.quitsmoke.app
 
-import android.content.res.Configuration
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
 
 open class BaseActivity : AppCompatActivity() {
 
-    protected open val useTransparentStatusBar: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
     }
 
-    override fun setContentView(layoutResID: Int) {
-        super.setContentView(layoutResID)
-        setupImmersiveStatusBar()
+    fun isColorDark(color: Int): Boolean {
+        val darkness = 1 - (0.299 * Color.red(color) +
+                           0.587 * Color.green(color) +
+                           0.114 * Color.blue(color)) / 255
+        return darkness >= 0.5
     }
 
-    override fun setContentView(view: View) {
-        super.setContentView(view)
-        setupImmersiveStatusBar()
+    fun lightenColor(color: Int, factor: Float): Int {
+        val r = (Color.red(color) + (255 - Color.red(color)) * factor).toInt().coerceIn(0, 255)
+        val g = (Color.green(color) + (255 - Color.green(color)) * factor).toInt().coerceIn(0, 255)
+        val b = (Color.blue(color) + (255 - Color.blue(color)) * factor).toInt().coerceIn(0, 255)
+        return Color.rgb(r, g, b)
     }
 
-    private fun setupImmersiveStatusBar() {
-        window.statusBarColor = if (useTransparentStatusBar) {
-            Color.TRANSPARENT
-        } else {
-            ContextCompat.getColor(this, R.color.status_bar)
-        }
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.nav_bar)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            window.isStatusBarContrastEnforced = false
-            window.isNavigationBarContrastEnforced = false
-        }
-
-        val controller = WindowCompat.getInsetsController(window, window.decorView)
-        val isLightTheme = (resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_YES
-        controller.isAppearanceLightStatusBars = isLightTheme
-        controller.isAppearanceLightNavigationBars = isLightTheme
+    fun darkenColor(color: Int, factor: Float): Int {
+        val r = (Color.red(color) * (1 - factor)).toInt().coerceIn(0, 255)
+        val g = (Color.green(color) * (1 - factor)).toInt().coerceIn(0, 255)
+        val b = (Color.blue(color) * (1 - factor)).toInt().coerceIn(0, 255)
+        return Color.rgb(r, g, b)
     }
 }

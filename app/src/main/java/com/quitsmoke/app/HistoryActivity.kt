@@ -1,5 +1,6 @@
 package com.quitsmoke.app
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
@@ -21,14 +22,34 @@ class HistoryActivity : BaseActivity() {
         repo = SmokeRepository.getInstance(this)
         binding.recyclerHistory.layoutManager = LinearLayoutManager(this)
 
-        binding.btnBackHistory.setOnClickListener {
-            finish()
-        }
+        binding.toolbar.setNavigationOnClickListener { finish() }
 
         loadHistory()
     }
 
+    override fun onResume() {
+        super.onResume()
+        applyThemeColor()
+    }
+
+    private fun applyThemeColor() {
+        val color = AppPreferences.getCachedThemeColor(this)
+        val colorInt = Color.parseColor(color)
+
+        // Toolbar
+        binding.toolbar.setBackgroundColor(colorInt)
+        binding.toolbar.setTitleTextColor(Color.WHITE)
+        binding.toolbar.navigationIcon?.setTint(Color.WHITE)
+
+        // Status bar
+        window.statusBarColor = colorInt
+        
+        // Reload history with new theme color
+        loadHistory()
+    }
+
     private fun loadHistory() {
+        val themeColor = Color.parseColor(AppPreferences.getCachedThemeColor(this))
         lifecycleScope.launch {
             val stats = repo.getWeeklyStats()
             if (stats.isEmpty()) {
@@ -38,8 +59,9 @@ class HistoryActivity : BaseActivity() {
             } else {
                 binding.tvHistoryEmpty.visibility = View.GONE
                 binding.recyclerHistory.visibility = View.VISIBLE
-                binding.recyclerHistory.adapter = HistoryAdapter(stats.reversed())
+                binding.recyclerHistory.adapter = HistoryAdapter(stats.reversed(), themeColor)
             }
         }
     }
 }
+
