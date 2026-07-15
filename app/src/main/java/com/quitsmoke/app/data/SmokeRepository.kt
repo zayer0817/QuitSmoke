@@ -38,12 +38,16 @@ class SmokeRepository internal constructor(
     suspend fun recordSmoke(offsetMinutes: Int = 0): SmokeRecord {
         val now = System.currentTimeMillis()
         val adjustedTimestamp = now + offsetMinutes * 60_000L
-        val calendar = Calendar.getInstance().apply { timeInMillis = adjustedTimestamp }
+        return recordSmokeAt(adjustedTimestamp)
+    }
+
+    suspend fun recordSmokeAt(timestamp: Long): SmokeRecord {
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
         val dateStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
         val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
 
         val record = SmokeRecord(
-            timestamp = adjustedTimestamp,
+            timestamp = timestamp,
             dateStr = dateStr,
             hourOfDay = hourOfDay
         )
@@ -88,6 +92,10 @@ class SmokeRepository internal constructor(
 
     suspend fun getRecordsByDate(dateStr: String): List<SmokeRecord> {
         return dao.getRecordsByDate(dateStr)
+    }
+
+    suspend fun getCountByHourRange(dateStr: String, startHour: Int, endHour: Int): Int {
+        return dao.getCountByHourRange(dateStr, startHour, endHour)
     }
 
     suspend fun getHourlyDistribution(): List<HourlyStat> {

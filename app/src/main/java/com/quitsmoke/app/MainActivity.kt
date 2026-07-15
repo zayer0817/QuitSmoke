@@ -34,6 +34,9 @@ class MainActivity : BaseActivity() {
 
         setupToolbar()
         setupListeners()
+        // 在注册 collect 之前先应用主题色，避免 Activity 销毁重建时
+        // collect 触发 updateBars() 用到默认绿色（themeColor 还未更新）
+        applyThemeColor()
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -54,6 +57,8 @@ class MainActivity : BaseActivity() {
         super.onResume()
         viewModel.loadData()
         applyThemeColor()
+        // 每次进入主页都通知小组件刷新——覆盖跨天 AlarmManager 失效场景
+        notifyWidgetUpdate()
     }
 
     private fun applyThemeColor() {

@@ -128,6 +128,17 @@ interface SmokeRecordDao {
         ORDER BY dateStr ASC
     """)
     suspend fun getDailyStatsRange(startDate: String, endDate: String): List<DailyStat>
+
+    /**
+     * 获取指定日期、指定小时范围内的记录数
+     * 用于自动补录功能：检查某时段（如早上6-11点）实际抽了几根
+     */
+    @Query("""
+        SELECT COUNT(*)
+        FROM smoke_records
+        WHERE dateStr = :dateStr AND hourOfDay >= :startHour AND hourOfDay < :endHour
+    """)
+    suspend fun getCountByHourRange(dateStr: String, startHour: Int, endHour: Int): Int
 }
 
 /**

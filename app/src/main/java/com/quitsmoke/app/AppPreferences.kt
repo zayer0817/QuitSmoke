@@ -3,7 +3,6 @@ package com.quitsmoke.app
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -20,10 +19,9 @@ private const val KEY_TRACKING_START_DATE_NAME = "tracking_start_date"
 private const val KEY_THEME_COLOR_NAME = "theme_color"
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
-    name = PREFS_NAME,
-    produceMigrations = { context ->
-        listOf(SharedPreferencesMigration(context, PREFS_NAME))
-    }
+    name = PREFS_NAME
+    // 不再使用 SharedPreferencesMigration——它会删除 SP 文件，
+    // 导致所有 getCachedXxx() 读 SP 时返回默认值，主题色偶发回退
 )
 
 object AppPreferences {
@@ -146,5 +144,151 @@ object AppPreferences {
             .edit()
             .putString(KEY_THEME_COLOR_NAME, color)
             .apply()
+    }
+
+    // ==================== 自动补录提醒 ====================
+
+    private const val KEY_REMINDER_ENABLED = "reminder_enabled"
+    private const val KEY_MORNING_EXPECTED = "morning_expected"
+    private const val KEY_NOON_EXPECTED = "noon_expected"
+    private const val KEY_EVENING_EXPECTED = "evening_expected"
+    private const val KEY_MORNING_CHECK_HOUR = "morning_check_hour"
+    private const val KEY_MORNING_CHECK_MINUTE = "morning_check_minute"
+    private const val KEY_NOON_CHECK_HOUR = "noon_check_hour"
+    private const val KEY_NOON_CHECK_MINUTE = "noon_check_minute"
+    private const val KEY_EVENING_CHECK_HOUR = "evening_check_hour"
+    private const val KEY_EVENING_CHECK_MINUTE = "evening_check_minute"
+    private const val KEY_END_OF_DAY_CHECK_HOUR = "eod_check_hour"
+    private const val KEY_END_OF_DAY_CHECK_MINUTE = "eod_check_minute"
+    private const val KEY_SKIP_DATE = "reminder_skip_date"
+    private const val KEY_SKIP_PERIODS = "reminder_skip_periods"
+
+    fun isReminderEnabled(context: Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_REMINDER_ENABLED, true)
+    }
+
+    fun setReminderEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_REMINDER_ENABLED, enabled).apply()
+    }
+
+    fun getExpectedCount(context: Context, period: String): Int {
+        val key = when (period) {
+            "morning" -> KEY_MORNING_EXPECTED
+            "noon" -> KEY_NOON_EXPECTED
+            "evening" -> KEY_EVENING_EXPECTED
+            else -> return 0
+        }
+        val default = when (period) {
+            "morning" -> 2
+            "noon" -> 3
+            "evening" -> 3
+            else -> 0
+        }
+        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getInt(key, default)
+    }
+
+    fun setExpectedCount(context: Context, period: String, count: Int) {
+        val key = when (period) {
+            "morning" -> KEY_MORNING_EXPECTED
+            "noon" -> KEY_NOON_EXPECTED
+            "evening" -> KEY_EVENING_EXPECTED
+            else -> return
+        }
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putInt(key, count).apply()
+    }
+
+    fun getCheckTime(context: Context, period: String): Pair<Int, Int> {
+        val (hourKey, minuteKey) = when (period) {
+            "morning" -> KEY_MORNING_CHECK_HOUR to KEY_MORNING_CHECK_MINUTE
+            "noon" -> KEY_NOON_CHECK_HOUR to KEY_NOON_CHECK_MINUTE
+            "evening" -> KEY_EVENING_CHECK_HOUR to KEY_EVENING_CHECK_MINUTE
+            "end_of_day" -> KEY_END_OF_DAY_CHECK_HOUR to KEY_END_OF_DAY_CHECK_MINUTE
+            else -> return 0 to 0
+        }
+        val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val defaultHour = when (period) {
+            "morning" -> 10
+            "noon" -> 15
+            "evening" -> 21
+            "end_of_day" -> 23
+            else -> 0
+        }
+        val defaultMinute = when (period) {
+            "end_of_day" -> 30
+            else -> 0
+        }
+        return sp.getInt(hourKey, defaultHour) to sp.getInt(minuteKey, defaultMinute)
+    }
+
+    fun setCheckTime(context: Context, period: String, hour: Int, minute: Int) {
+        val (hourKey, minuteKey) = when (period) {
+            "morning" -> KEY_MORNING_CHECK_HOUR to KEY_MORNING_CHECK_MINUTE
+            "noon" -> KEY_NOON_CHECK_HOUR to KEY_NOON_CHECK_MINUTE
+            "evening" -> KEY_EVENING_CHECK_HOUR to KEY_EVENING_CHECK_MINUTE
+            "end_of_day" -> KEY_END_OF_DAY_CHECK_HOUR to KEY_END_OF_DAY_CHECK_MINUTE
+            else -> return
+        }
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putInt(hourKey, hour).putInt(minuteKey, minute).apply()
+    }
+
+    /**
+     * 检查今天某个时段是否已被跳过
+     */
+    fun isPeriodSkippedToday(context: Context, period: String): Boolean {
+        val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+            .format(java.util.Date())
+        val skipDate = sp.getString(KEY_SKIP_DATE, "") ?: ""
+        if (skipDate != todayStr) return false
+        val skipped = sp.getString(KEY_SKIP_PERIODS, "") ?: ""
+        return skipped.split(",").contains(period)
+    }
+
+    /**
+     * 标记今天某个时段已跳过，今天内不再提醒
+     */
+    fun markPeriodSkippedToday(context: Context, period: String) {
+        val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+            .format(java.util.Date())
+        val existingDate = sp.getString(KEY_SKIP_DATE, "") ?: ""
+        val existingPeriods = if (existingDate == todayStr) {
+            sp.getString(KEY_SKIP_PERIODS, "") ?: ""
+        } else {
+            ""
+        }
+        val newPeriods = if (existingPeriods.isEmpty()) period
+        else if (existingPeriods.split(",").contains(period)) existingPeriods
+        else "$existingPeriods,$period"
+        sp.edit()
+            .putString(KEY_SKIP_DATE, todayStr)
+            .putString(KEY_SKIP_PERIODS, newPeriods)
+            .apply()
+    }
+
+    /**
+     * 获取时段的时间范围（起始小时, 结束小时）
+     */
+    fun getPeriodHourRange(period: String): Pair<Int, Int> {
+        return when (period) {
+            "morning" -> 6 to 11
+            "noon" -> 11 to 17
+            "evening" -> 17 to 23
+            else -> 0 to 0
+        }
+    }
+
+    fun getPeriodLabel(period: String): String {
+        return when (period) {
+            "morning" -> "早间"
+            "noon" -> "午间"
+            "evening" -> "晚间"
+            else -> period
+        }
     }
 }

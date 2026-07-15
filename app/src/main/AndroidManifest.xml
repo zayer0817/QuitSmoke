@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- 设备重启后重新调度小组件凌晨闹钟 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:name=".QuitSmokeApp"
         android:allowBackup="true"
@@ -54,6 +57,9 @@
                 <action android:name="android.intent.action.DATE_CHANGED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -69,6 +75,27 @@
                 <action android:name="com.quitsmoke.app.ACTION_UNDO" />
             </intent-filter>
         </receiver>
+
+        <!-- 自动补录提醒广播接收器 -->
+        <receiver
+            android:name=".reminder.ReminderReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.quitsmoke.app.ACTION_CHECK_REMINDER" />
+                <action android:name="com.quitsmoke.app.ACTION_FILL_REMINDER" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 自动补录弹窗Activity -->
+        <activity
+            android:name=".reminder.ReminderActivity"
+            android:theme="@style/Theme.QuitSmoke.Transparent"
+            android:exported="false" />
 
     </application>
 

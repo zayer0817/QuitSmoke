@@ -33,11 +33,58 @@ class SmokeWidgetProvider : AppWidgetProvider() {
             }
             context.sendBroadcast(intent)
         }
+
+        /**
+         * 确保凌晨闹钟已调度。
+         * 可从 Application.onCreate / BOOT_COMPLETED / onReceive 等任意入口调用，
+         * 重复调用安全（PendingIntent 用 FLAG_UPDATE_CURRENT 覆盖旧值）。
+         */
+        fun ensureMidnightUpdateScheduled(context: Context) {
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val pendingIntent = midnightUpdatePendingIntent(context)
+
+            // 计算下一个凌晨 0:01 的时间戳
+            val triggerAtMillis = Calendar.getInstance().apply {
+                // 如果当前时间还没到今天 0:01，就设今天；否则设明天
+                val now = System.currentTimeMillis()
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 1)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+                if (timeInMillis <= now) {
+                    add(Calendar.DAY_OF_YEAR, 1)
+                }
+            }.timeInMillis
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+            }
+        }
+
+        private fun cancelMidnightUpdate(context: Context) {
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.cancel(midnightUpdatePendingIntent(context))
+        }
+
+        private fun midnightUpdatePendingIntent(context: Context): PendingIntent {
+            val intent = Intent(context, SmokeWidgetProvider::class.java).apply {
+                action = ACTION_MIDNIGHT_UPDATE
+                setPackage(context.packageName)
+            }
+            return PendingIntent.getBroadcast(
+                context,
+                REQUEST_MIDNIGHT_UPDATE,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
     }
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        scheduleNextMidnightUpdate(context.applicationContext)
+        ensureMidnightUpdateScheduled(context.applicationContext)
     }
 
     override fun onDisabled(context: Context) {
@@ -51,7 +98,8 @@ class SmokeWidgetProvider : AppWidgetProvider() {
         appWidgetIds: IntArray
     ) {
         val appContext = context.applicationContext
-        scheduleNextMidnightUpdate(appContext)
+        // 确保凌晨闹钟链路不断
+        ensureMidnightUpdateScheduled(appContext)
 
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             val repo = SmokeRepository.getInstance(appContext)
@@ -68,55 +116,32 @@ class SmokeWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         val appContext = context.applicationContext
+        val action = intent.action
 
-        when (intent.action) {
+        // 所有可能需要刷新小组件的 action
+        val refreshActions = setOf(
             ACTION_UPDATE_WIDGET,
             ACTION_MIDNIGHT_UPDATE,
             Intent.ACTION_DATE_CHANGED,
             Intent.ACTION_TIME_CHANGED,
-            Intent.ACTION_TIMEZONE_CHANGED -> {
-                val appWidgetManager = AppWidgetManager.getInstance(appContext)
-                val componentName = ComponentName(appContext, SmokeWidgetProvider::class.java)
-                val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
+            Intent.ACTION_TIMEZONE_CHANGED,
+            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_LOCKED_BOOT_COMPLETED,
+            "android.intent.action.MY_PACKAGE_REPLACED"
+        )
+
+        if (action in refreshActions) {
+            // 1. 总是重新调度凌晨闹钟（三重保障：防止链路断裂）
+            ensureMidnightUpdateScheduled(appContext)
+
+            // 2. 刷新小组件 UI
+            val appWidgetManager = AppWidgetManager.getInstance(appContext)
+            val componentName = ComponentName(appContext, SmokeWidgetProvider::class.java)
+            val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
+            if (widgetIds.isNotEmpty()) {
                 onUpdate(appContext, appWidgetManager, widgetIds)
             }
         }
-    }
-
-    private fun scheduleNextMidnightUpdate(context: Context) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val pendingIntent = midnightUpdatePendingIntent(context)
-        val triggerAtMillis = Calendar.getInstance().apply {
-            add(Calendar.DAY_OF_YEAR, 1)
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 1)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }.timeInMillis
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-        } else {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-        }
-    }
-
-    private fun cancelMidnightUpdate(context: Context) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.cancel(midnightUpdatePendingIntent(context))
-    }
-
-    private fun midnightUpdatePendingIntent(context: Context): PendingIntent {
-        val intent = Intent(context, SmokeWidgetProvider::class.java).apply {
-            action = ACTION_MIDNIGHT_UPDATE
-            setPackage(context.packageName)
-        }
-        return PendingIntent.getBroadcast(
-            context,
-            REQUEST_MIDNIGHT_UPDATE,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
     }
 
     private suspend fun buildRemoteViews(context: Context, todayCount: Int, dailyTarget: Int): RemoteViews {

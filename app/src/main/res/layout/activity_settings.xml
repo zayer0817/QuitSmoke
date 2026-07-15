@@ -81,6 +81,230 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="补录提醒"
+                android:textAppearance="?attr/textAppearanceLabelLarge"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:paddingStart="4dp"
+                android:paddingBottom="8dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="启用自动补录"
+                            android:textAppearance="?attr/textAppearanceBodyLarge"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switch_reminder"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="到固定时间检查记录数，不足时提醒补上"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <!-- 预期数量 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="预期数量"
+                        android:textAppearance="?attr/textAppearanceTitleSmall"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <LinearLayout
+                        android:id="@+id/layout_expected"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="vertical">
+
+                        <!-- Morning -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="早间 (6:00-11:00)"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="?attr/colorOnSurface" />
+                            <ImageButton
+                                android:id="@+id/btn_morning_minus"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_remove"
+                                android:scaleType="centerInside"
+                                android:padding="8dp"
+                                android:background="@drawable/bg_outlined_button" />
+                            <TextView
+                                android:id="@+id/tv_morning_expected"
+                                android:layout_width="40dp"
+                                android:layout_height="wrap_content"
+                                android:text="2"
+                                android:textAppearance="?attr/textAppearanceBodyLarge"
+                                android:textColor="?attr/colorOnSurface"
+                                android:gravity="center" />
+                            <ImageButton
+                                android:id="@+id/btn_morning_plus"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginEnd="16dp"
+                                android:src="@drawable/ic_add"
+                                android:scaleType="centerInside"
+                                android:padding="8dp"
+                                android:background="@drawable/bg_outlined_button" />
+                            <TextView
+                                android:id="@+id/tv_morning_check"
+                                android:layout_width="60dp"
+                                android:layout_height="wrap_content"
+                                android:text="10:00"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="?attr/colorPrimary"
+                                android:gravity="center"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:background="?attr/selectableItemBackground" />
+                        </LinearLayout>
+
+                        <!-- Noon -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="午间 (11:00-17:00)"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="?attr/colorOnSurface" />
+                            <ImageButton
+                                android:id="@+id/btn_noon_minus"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_remove"
+                                android:scaleType="centerInside"
+                                android:padding="8dp"
+                                android:background="@drawable/bg_outlined_button" />
+                            <TextView
+                                android:id="@+id/tv_noon_expected"
+                                android:layout_width="40dp"
+                                android:layout_height="wrap_content"
+                                android:text="3"
+                                android:textAppearance="?attr/textAppearanceBodyLarge"
+                                android:textColor="?attr/colorOnSurface"
+                                android:gravity="center" />
+                            <ImageButton
+                                android:id="@+id/btn_noon_plus"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginEnd="16dp"
+                                android:src="@drawable/ic_add"
+                                android:scaleType="centerInside"
+                                android:padding="8dp"
+                                android:background="@drawable/bg_outlined_button" />
+                            <TextView
+                                android:id="@+id/tv_noon_check"
+                                android:layout_width="60dp"
+                                android:layout_height="wrap_content"
+                                android:text="15:00"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="?attr/colorPrimary"
+                                android:gravity="center"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:background="?attr/selectableItemBackground" />
+                        </LinearLayout>
+
+                        <!-- Evening -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="晚间 (17:00-23:00)"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="?attr/colorOnSurface" />
+                            <ImageButton
+                                android:id="@+id/btn_evening_minus"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_remove"
+                                android:scaleType="centerInside"
+                                android:padding="8dp"
+                                android:background="@drawable/bg_outlined_button" />
+                            <TextView
+                                android:id="@+id/tv_evening_expected"
+                                android:layout_width="40dp"
+                                android:layout_height="wrap_content"
+                                android:text="3"
+                                android:textAppearance="?attr/textAppearanceBodyLarge"
+                                android:textColor="?attr/colorOnSurface"
+                                android:gravity="center" />
+                            <ImageButton
+                                android:id="@+id/btn_evening_plus"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginEnd="16dp"
+                                android:src="@drawable/ic_add"
+                                android:scaleType="centerInside"
+                                android:padding="8dp"
+                                android:background="@drawable/bg_outlined_button" />
+                            <TextView
+                                android:id="@+id/tv_evening_check"
+                                android:layout_width="60dp"
+                                android:layout_height="wrap_content"
+                                android:text="21:00"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="?attr/colorPrimary"
+                                android:gravity="center"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:background="?attr/selectableItemBackground" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="@string/section_goal"
                 android:textAppearance="?attr/textAppearanceLabelLarge"
                 android:textColor="?attr/colorOnSurfaceVariant"

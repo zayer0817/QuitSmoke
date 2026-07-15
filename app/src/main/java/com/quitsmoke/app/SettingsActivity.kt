@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.quitsmoke.app.data.SmokeRecord
 import com.quitsmoke.app.data.SmokeRepository
 import com.quitsmoke.app.databinding.ActivitySettingsBinding
+import com.quitsmoke.app.reminder.ReminderReceiver
 import com.quitsmoke.app.widget.SmokeWidgetProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,6 +59,7 @@ class SettingsActivity : BaseActivity() {
             updateThemeUI()
             updateGoalUI()
             loadDataSummary()
+            loadReminderConfig()
         }
     }
 
@@ -96,7 +99,30 @@ class SettingsActivity : BaseActivity() {
         for (btn in outlinedButtons) {
             btn.setTextColor(colorInt)
             btn.strokeColor = android.content.res.ColorStateList.valueOf(colorInt)
+            btn.iconTint = android.content.res.ColorStateList.valueOf(colorInt)
         }
+
+        // 补录提醒 ImageButton 图标着色 + 边框
+        val reminderIconButtons = listOf(
+            binding.btnMorningMinus, binding.btnMorningPlus,
+            binding.btnNoonMinus, binding.btnNoonPlus,
+            binding.btnEveningMinus, binding.btnEveningPlus
+        )
+        for (ib in reminderIconButtons) {
+            ib.imageTintList = android.content.res.ColorStateList.valueOf(colorInt)
+            (ib.background as? android.graphics.drawable.GradientDrawable)?.setStroke(
+                2, colorInt
+            )
+        }
+
+        // Switch 跟随主题色
+        binding.switchReminder.thumbTintList = android.content.res.ColorStateList.valueOf(colorInt)
+        binding.switchReminder.trackTintList = android.content.res.ColorStateList.valueOf(colorInt)
+
+        // 检查时间文字跟随主题色
+        binding.tvMorningCheck.setTextColor(colorInt)
+        binding.tvNoonCheck.setTextColor(colorInt)
+        binding.tvEveningCheck.setTextColor(colorInt)
 
         // Update color circle selection highlight
         updateColorCircleSelection(color)
@@ -155,16 +181,99 @@ class SettingsActivity : BaseActivity() {
 
         binding.btnExport.setOnClickListener { exportData() }
         binding.btnImport.setOnClickListener { importData() }
+
+        // 自动补录提醒
+        binding.switchReminder.setOnCheckedChangeListener { _, isChecked ->
+            AppPreferences.setReminderEnabled(this, isChecked)
+            if (isChecked) {
+                ReminderReceiver.scheduleAllReminders(this)
+            } else {
+                ReminderReceiver.cancelAllReminders(this)
+            }
+        }
+
+        setupExpectedCountButtons("morning", binding.btnMorningMinus, binding.btnMorningPlus, binding.tvMorningExpected)
+        setupExpectedCountButtons("noon", binding.btnNoonMinus, binding.btnNoonPlus, binding.tvNoonExpected)
+        setupExpectedCountButtons("evening", binding.btnEveningMinus, binding.btnEveningPlus, binding.tvEveningExpected)
+
+        binding.tvMorningCheck.setOnClickListener { pickCheckTime("morning", binding.tvMorningCheck) }
+        binding.tvNoonCheck.setOnClickListener { pickCheckTime("noon", binding.tvNoonCheck) }
+        binding.tvEveningCheck.setOnClickListener { pickCheckTime("evening", binding.tvEveningCheck) }
+    }
+
+    private fun setupExpectedCountButtons(
+        period: String,
+        btnMinus: android.widget.ImageButton,
+        btnPlus: android.widget.ImageButton,
+        tvCount: TextView
+    ) {
+        btnMinus.setOnClickListener {
+            val current = AppPreferences.getExpectedCount(this, period)
+            val newVal = (current - 1).coerceAtLeast(0)
+            AppPreferences.setExpectedCount(this, period, newVal)
+            tvCount.text = newVal.toString()
+        }
+        btnPlus.setOnClickListener {
+            val current = AppPreferences.getExpectedCount(this, period)
+            val newVal = (current + 1).coerceAtMost(20)
+            AppPreferences.setExpectedCount(this, period, newVal)
+            tvCount.text = newVal.toString()
+        }
+    }
+
+    private fun pickCheckTime(period: String, tvDisplay: TextView) {
+        val (currentHour, currentMinute) = AppPreferences.getCheckTime(this, period)
+        val view = layoutInflater.inflate(R.layout.dialog_time_picker, null)
+        val timePicker = view.findViewById<TimePicker>(R.id.time_picker)
+        timePicker.setIs24HourView(true)
+        timePicker.hour = currentHour
+        timePicker.minute = currentMinute
+
+        AlertDialog.Builder(this)
+            .setTitle("设置${AppPreferences.getPeriodLabel(period)}检查时间")
+            .setView(view)
+            .setPositiveButton("确定") { _, _ ->
+                val hour = timePicker.hour
+                val minute = timePicker.minute
+                AppPreferences.setCheckTime(this, period, hour, minute)
+                tvDisplay.text = String.format("%02d:%02d", hour, minute)
+                // 重新调度该时段闹钟
+                ReminderReceiver.scheduleReminder(this, period)
+            }
+            .setNegativeButton("取消", null)
+            .show()
+    }
+
+    private fun loadReminderConfig() {
+        binding.switchReminder.isChecked = AppPreferences.isReminderEnabled(this)
+        binding.tvMorningExpected.text = AppPreferences.getExpectedCount(this, "morning").toString()
+        binding.tvNoonExpected.text = AppPreferences.getExpectedCount(this, "noon").toString()
+        binding.tvEveningExpected.text = AppPreferences.getExpectedCount(this, "evening").toString()
+
+        val (mh, mm) = AppPreferences.getCheckTime(this, "morning")
+        binding.tvMorningCheck.text = String.format("%02d:%02d", mh, mm)
+        val (nh, nm) = AppPreferences.getCheckTime(this, "noon")
+        binding.tvNoonCheck.text = String.format("%02d:%02d", nh, nm)
+        val (eh, em) = AppPreferences.getCheckTime(this, "evening")
+        binding.tvEveningCheck.text = String.format("%02d:%02d", eh, em)
     }
 
     private fun switchThemeColor(color: String) {
         // Apply immediately for fast UI response
         applyThemeColorDirect(color)
-        
+
+        // 立即写入 SharedPreferences——必须在协程之前。
+        // setThemeColor() 是 suspend 函数，里面的 DataStore I/O 可能延迟，
+        // 导致 SP 写入滞后。如果用户在协程完成前返回 MainActivity，
+        // getCachedThemeColor() 会读到旧颜色，柱状图跳回默认色。
+        getSharedPreferences("quitsmoke_prefs", MODE_PRIVATE)
+            .edit()
+            .putString("theme_color", color)
+            .commit()  // commit() 同步写磁盘，apply() 异步可能被杀进程导致丢失
+
         lifecycleScope.launch {
             AppPreferences.setThemeColor(this@SettingsActivity, color)
             updateThemeColorUI()
-            // 通知小组件刷新按钮颜色
             SmokeWidgetProvider.notifyWidgetUpdate(this@SettingsActivity)
         }
     }
@@ -192,7 +301,30 @@ class SettingsActivity : BaseActivity() {
         for (btn in outlinedButtons) {
             btn.setTextColor(colorInt)
             btn.strokeColor = android.content.res.ColorStateList.valueOf(colorInt)
+            btn.iconTint = android.content.res.ColorStateList.valueOf(colorInt)
         }
+
+        // 补录提醒 ImageButton 图标着色 + 边框
+        val reminderIconButtons = listOf(
+            binding.btnMorningMinus, binding.btnMorningPlus,
+            binding.btnNoonMinus, binding.btnNoonPlus,
+            binding.btnEveningMinus, binding.btnEveningPlus
+        )
+        for (ib in reminderIconButtons) {
+            ib.imageTintList = android.content.res.ColorStateList.valueOf(colorInt)
+            (ib.background as? android.graphics.drawable.GradientDrawable)?.setStroke(
+                2, colorInt
+            )
+        }
+
+        // Switch 跟随主题色
+        binding.switchReminder.thumbTintList = android.content.res.ColorStateList.valueOf(colorInt)
+        binding.switchReminder.trackTintList = android.content.res.ColorStateList.valueOf(colorInt)
+
+        // 检查时间文字跟随主题色
+        binding.tvMorningCheck.setTextColor(colorInt)
+        binding.tvNoonCheck.setTextColor(colorInt)
+        binding.tvEveningCheck.setTextColor(colorInt)
 
         // Update color circle selection highlight
         updateColorCircleSelection(color)
