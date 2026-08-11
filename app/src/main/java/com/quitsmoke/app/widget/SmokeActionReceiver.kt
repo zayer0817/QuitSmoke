@@ -11,7 +11,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.util.Calendar
 
 class SmokeActionReceiver : BroadcastReceiver() {
 
@@ -25,6 +27,9 @@ class SmokeActionReceiver : BroadcastReceiver() {
         private var lastClickTime = 0L
         private var rapidClickCount = 0
         private var cachedTodayCount = -1
+
+        /** 串行化数据库写入，防止并发导致卡死 */
+        private val smokeMutex = Mutex()
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -48,24 +53,46 @@ class SmokeActionReceiver : BroadcastReceiver() {
             rapidClickCount = 0
         }
 
-        val offsetMinutes = rapidClickCount * INTERVAL_MINUTES
+        // 计算偏移量，但不能跨到第二天
+        val offsetMinutes = clampOffsetToToday(now, rapidClickCount * INTERVAL_MINUTES)
         val estimatedCount = if (cachedTodayCount >= 0) cachedTodayCount + 1 + rapidClickCount else -1
 
         showQuickToast(context, estimatedCount, rapidClickCount)
 
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
-                val repo = SmokeRepository.getInstance(context)
-                repo.recordSmoke(offsetMinutes)
-                val todayCount = repo.getTodayCount()
-                cachedTodayCount = todayCount
-
-                withContext(Dispatchers.Main) {
-                    SmokeWidgetProvider.notifyWidgetUpdate(context)
+                // 用 Mutex 串行化，防止并发 DB 写入导致卡死
+                smokeMutex.withLock {
+                    val repo = SmokeRepository.getInstance(context)
+                    repo.recordSmoke(offsetMinutes)
+                    val todayCount = repo.getTodayCount()
+                    cachedTodayCount = todayCount
                 }
+                // 锁外刷新小组件（sendBroadcast 线程安全，不需要切 Main 线程）
+                SmokeWidgetProvider.notifyWidgetUpdate(context)
             } finally {
                 pendingResult.finish()
             }
+        }
+    }
+
+    /**
+     * 如果偏移后的时间会跨到第二天，就把偏移量截断到今天 23:59。
+     * 防止接近零点时快速点击导致记录跑到第二天。
+     */
+    private fun clampOffsetToToday(now: Long, offsetMinutes: Int): Int {
+        if (offsetMinutes <= 0) return 0
+        val endOfToday = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        val projectedTime = now + offsetMinutes * 60_000L
+        return if (projectedTime > endOfToday) {
+            ((endOfToday - now) / 60_000L).toInt().coerceIn(0, offsetMinutes)
+        } else {
+            offsetMinutes
         }
     }
 
@@ -88,18 +115,19 @@ class SmokeActionReceiver : BroadcastReceiver() {
     private fun handleUndo(context: Context, pendingResult: PendingResult) {
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             try {
-                val repo = SmokeRepository.getInstance(context)
-                val success = repo.undoLastSmoke()
-                val todayCount = repo.getTodayCount()
+                smokeMutex.withLock {
+                    val repo = SmokeRepository.getInstance(context)
+                    val success = repo.undoLastSmoke()
+                    val todayCount = repo.getTodayCount()
+                    cachedTodayCount = todayCount
 
-                withContext(Dispatchers.Main) {
                     if (success) {
                         Toast.makeText(context, context.getString(R.string.toast_undo_success, todayCount), Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(context, context.getString(R.string.toast_undo_empty), Toast.LENGTH_SHORT).show()
                     }
-                    SmokeWidgetProvider.notifyWidgetUpdate(context)
                 }
+                SmokeWidgetProvider.notifyWidgetUpdate(context)
             } finally {
                 pendingResult.finish()
             }

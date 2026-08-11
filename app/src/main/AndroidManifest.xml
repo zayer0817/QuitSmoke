@@ -3,6 +3,8 @@
 
     <!-- 设备重启后重新调度小组件凌晨闹钟 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- 调用 DeepSeek AI API 需要联网 -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".QuitSmokeApp"
@@ -96,6 +98,12 @@
             android:name=".reminder.ReminderActivity"
             android:theme="@style/Theme.QuitSmoke.Transparent"
             android:exported="false" />
+
+        <!-- 月度 AI 数据分析报告 -->
+        <activity
+            android:name=".MonthlyReportActivity"
+            android:label="月度分析"
+            android:parentActivityName=".SettingsActivity" />
 
     </application>
 

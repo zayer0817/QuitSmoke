@@ -60,6 +60,7 @@ class SettingsActivity : BaseActivity() {
             updateGoalUI()
             loadDataSummary()
             loadReminderConfig()
+            loadAiConfig()
         }
     }
 
@@ -80,7 +81,8 @@ class SettingsActivity : BaseActivity() {
         // All filled buttons - set background tint and white text
         val filledButtons = listOf(
             binding.btnTargetPlus,
-            binding.btnImport
+            binding.btnImport,
+            binding.btnMonthlyReport
         )
         for (btn in filledButtons) {
             btn.backgroundTintList = android.content.res.ColorStateList.valueOf(colorInt)
@@ -94,7 +96,8 @@ class SettingsActivity : BaseActivity() {
             binding.btnCustomColor,
             binding.btnThemeSystem,
             binding.btnThemeLight,
-            binding.btnThemeDark
+            binding.btnThemeDark,
+            binding.btnSaveApiKey
         )
         for (btn in outlinedButtons) {
             btn.setTextColor(colorInt)
@@ -182,6 +185,17 @@ class SettingsActivity : BaseActivity() {
         binding.btnExport.setOnClickListener { exportData() }
         binding.btnImport.setOnClickListener { importData() }
 
+        // AI 分析
+        binding.btnSaveApiKey.setOnClickListener { saveApiKey() }
+        binding.btnMonthlyReport.setOnClickListener {
+            val apiKey = AppPreferences.getAiApiKey(this)
+            if (apiKey.isBlank()) {
+                Toast.makeText(this, "请先输入并保存 API Key", Toast.LENGTH_SHORT).show()
+            } else {
+                startActivity(Intent(this, MonthlyReportActivity::class.java))
+            }
+        }
+
         // 自动补录提醒
         binding.switchReminder.setOnCheckedChangeListener { _, isChecked ->
             AppPreferences.setReminderEnabled(this, isChecked)
@@ -258,6 +272,23 @@ class SettingsActivity : BaseActivity() {
         binding.tvEveningCheck.text = String.format("%02d:%02d", eh, em)
     }
 
+    private fun loadAiConfig() {
+        val key = AppPreferences.getAiApiKey(this)
+        if (key.isNotBlank()) {
+            binding.etApiKey.setText(key)
+        }
+    }
+
+    private fun saveApiKey() {
+        val key = binding.etApiKey.text.toString().trim()
+        if (key.isBlank()) {
+            Toast.makeText(this, "请输入 API Key", Toast.LENGTH_SHORT).show()
+            return
+        }
+        AppPreferences.setAiApiKey(this, key)
+        Toast.makeText(this, "API Key 已保存", Toast.LENGTH_SHORT).show()
+    }
+
     private fun switchThemeColor(color: String) {
         // Apply immediately for fast UI response
         applyThemeColorDirect(color)
@@ -287,7 +318,7 @@ class SettingsActivity : BaseActivity() {
         binding.toolbar.navigationIcon?.setTint(android.graphics.Color.WHITE)
 
         // All filled buttons
-        val filledButtons = listOf(binding.btnTargetPlus, binding.btnImport)
+        val filledButtons = listOf(binding.btnTargetPlus, binding.btnImport, binding.btnMonthlyReport)
         for (btn in filledButtons) {
             btn.backgroundTintList = android.content.res.ColorStateList.valueOf(colorInt)
             btn.setTextColor(android.graphics.Color.WHITE)
@@ -296,7 +327,8 @@ class SettingsActivity : BaseActivity() {
         // All outlined buttons
         val outlinedButtons = listOf(
             binding.btnTargetMinus, binding.btnExport, binding.btnCustomColor,
-            binding.btnThemeSystem, binding.btnThemeLight, binding.btnThemeDark
+            binding.btnThemeSystem, binding.btnThemeLight, binding.btnThemeDark,
+            binding.btnSaveApiKey
         )
         for (btn in outlinedButtons) {
             btn.setTextColor(colorInt)

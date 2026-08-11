@@ -139,6 +139,50 @@ interface SmokeRecordDao {
         WHERE dateStr = :dateStr AND hourOfDay >= :startHour AND hourOfDay < :endHour
     """)
     suspend fun getCountByHourRange(dateStr: String, startHour: Int, endHour: Int): Int
+
+    /**
+     * 获取指定日期范围内、指定小时范围内的记录总数
+     * 用于月度分析：统计某月早/午/晚各时段的总数
+     */
+    @Query("""
+        SELECT COUNT(*)
+        FROM smoke_records
+        WHERE dateStr >= :startDate AND dateStr <= :endDate
+            AND hourOfDay >= :startHour AND hourOfDay < :endHour
+    """)
+    suspend fun getCountByDateRangeAndHourRange(
+        startDate: String,
+        endDate: String,
+        startHour: Int,
+        endHour: Int
+    ): Int
+
+    /**
+     * 获取指定日期范围内的小时分布
+     * 用于月度分析：24 小时分布图
+     */
+    @Query("""
+        SELECT hourOfDay, COUNT(*) as count
+        FROM smoke_records
+        WHERE dateStr >= :startDate AND dateStr <= :endDate
+        GROUP BY hourOfDay
+        ORDER BY hourOfDay ASC
+    """)
+    suspend fun getHourlyDistributionByDateRange(
+        startDate: String,
+        endDate: String
+    ): List<HourlyStat>
+
+    /**
+     * 获取指定日期范围内的所有原始记录
+     * 用于 AI 分析的周末/工作日 × 时段交叉聚合
+     */
+    @Query("""
+        SELECT * FROM smoke_records
+        WHERE dateStr >= :startDate AND dateStr <= :endDate
+        ORDER BY timestamp ASC
+    """)
+    suspend fun getRecordsByDateRange(startDate: String, endDate: String): List<SmokeRecord>
 }
 
 /**

@@ -291,4 +291,75 @@ object AppPreferences {
             else -> period
         }
     }
+
+    // ==================== AI 分析 ====================
+
+    private const val KEY_AI_API_KEY = "ai_api_key"
+    private const val KEY_CACHED_REPORT = "cached_report_md"
+    private const val KEY_CACHED_REPORT_LABEL = "cached_report_label"
+    private const val KEY_CACHED_REPORT_START = "cached_report_start"
+    private const val KEY_CACHED_REPORT_END = "cached_report_end"
+    private const val KEY_CACHED_REPORT_TIME = "cached_report_time"
+
+    /** 缓存上次分析报告，下次进入页面可直接查看 */
+    fun saveCachedReport(context: Context, markdown: String, label: String, start: String, end: String) {
+        val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val now = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
+            .format(java.util.Date())
+        sp.edit()
+            .putString(KEY_CACHED_REPORT, markdown)
+            .putString(KEY_CACHED_REPORT_LABEL, label)
+            .putString(KEY_CACHED_REPORT_START, start)
+            .putString(KEY_CACHED_REPORT_END, end)
+            .putString(KEY_CACHED_REPORT_TIME, now)
+            .apply()
+    }
+
+    fun getCachedReport(context: Context): String? {
+        val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val md = sp.getString(KEY_CACHED_REPORT, null)
+        return md?.takeIf { it.isNotBlank() }
+    }
+
+    data class CachedReportMeta(
+        val label: String,
+        val start: String,
+        val end: String,
+        val time: String
+    )
+
+    fun getCachedReportMeta(context: Context): CachedReportMeta? {
+        val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val md = sp.getString(KEY_CACHED_REPORT, null)
+        if (md.isNullOrBlank()) return null
+        return CachedReportMeta(
+            label = sp.getString(KEY_CACHED_REPORT_LABEL, "") ?: "",
+            start = sp.getString(KEY_CACHED_REPORT_START, "") ?: "",
+            end = sp.getString(KEY_CACHED_REPORT_END, "") ?: "",
+            time = sp.getString(KEY_CACHED_REPORT_TIME, "") ?: ""
+        )
+    }
+
+    fun clearCachedReport(context: Context) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .remove(KEY_CACHED_REPORT)
+            .remove(KEY_CACHED_REPORT_LABEL)
+            .remove(KEY_CACHED_REPORT_START)
+            .remove(KEY_CACHED_REPORT_END)
+            .remove(KEY_CACHED_REPORT_TIME)
+            .apply()
+    }
+
+    fun getAiApiKey(context: Context): String {
+        val saved = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_AI_API_KEY, "") ?: ""
+        // 用户未手动配置时，使用构建时注入的默认 Key（local.properties）
+        return saved.ifBlank { BuildConfig.DEEPSEEK_API_KEY }
+    }
+
+    fun setAiApiKey(context: Context, key: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putString(KEY_AI_API_KEY, key).apply()
+    }
 }

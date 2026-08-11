@@ -1,10 +1,18 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import java.util.Properties
 
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
 }
+
+// 从 local.properties 读取本地密钥（不入库）
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+val deepseekApiKey: String = localProps.getProperty("deepseek.api.key", "")
 
 android {
     namespace = "com.quitsmoke.app"
@@ -14,8 +22,11 @@ android {
         applicationId = "com.quitsmoke.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 11
-        versionName = "1.6.0"
+        versionCode = 12
+        versionName = "1.7.0"
+
+        // DeepSeek API Key 默认值（来自 local.properties，仅本机构建有效）
+        buildConfigField("String", "DEEPSEEK_API_KEY", "\"$deepseekApiKey\"")
     }
 
     buildTypes {
@@ -64,6 +75,11 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // OkHttp - 调用 DeepSeek AI API
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    // Markwon - 渲染 AI 返回的 Markdown 报告
+    implementation("io.noties.markwon:core:4.6.2")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
